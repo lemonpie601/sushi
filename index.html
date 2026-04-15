@@ -138,7 +138,7 @@ body{
 
 /* 손님 아바타 */
 .cust-img-wrap{
-  position:relative;cursor:pointer;
+  position:relative;
   width:100%;display:flex;justify-content:center;
 }
 .cust-img{
@@ -151,13 +151,15 @@ body{
 }
 .cust-img.eating{filter:drop-shadow(0 3px 6px rgba(0,0,0,.3)) brightness(1.1) hue-rotate(80deg);}
 .cust-img.angry{filter:drop-shadow(0 3px 6px rgba(0,0,0,.3)) saturate(1.8) hue-rotate(-20deg) brightness(.9);}
-.upload-hint{
+.upload-btn{
   position:absolute;bottom:0;left:50%;transform:translateX(-50%);
-  background:rgba(0,0,0,.55);color:#fff;
+  background:rgba(0,0,0,.6);color:#fff;
   font-size:8px;padding:2px 6px;border-radius:0 0 4px 4px;
   opacity:0;transition:opacity .2s;white-space:nowrap;
+  cursor:pointer;border:none;font-family:'Noto Sans KR',sans-serif;
+  pointer-events:none;
 }
-.cust-img-wrap:hover .upload-hint{opacity:1;}
+.cust-img-wrap:hover .upload-btn{opacity:1;pointer-events:auto;}
 input.file-in{display:none;}
 
 /* 타이머 바 */
@@ -369,27 +371,27 @@ input.file-in{display:none;}
   <div id="cust-row">
     <div class="seat" id="seat-0">
       <div class="bubble hidden" id="bub-0"></div>
-      <div class="cust-img-wrap" onclick="triggerUp(0)">
+      <div class="cust-img-wrap">
         <img class="cust-img" id="cimg-0" src="" alt="">
-        <div class="upload-hint">📷 이미지 변경</div>
+        <button class="upload-btn" onclick="triggerUp(0)">📷 변경</button>
         <input class="file-in" id="fin-0" type="file" accept="image/*" onchange="loadImg(0,this)">
       </div>
       <div class="cust-tbar-bg"><div class="cust-tbar" id="ctbar-0"></div></div>
     </div>
     <div class="seat" id="seat-1">
       <div class="bubble hidden" id="bub-1"></div>
-      <div class="cust-img-wrap" onclick="triggerUp(1)">
+      <div class="cust-img-wrap">
         <img class="cust-img" id="cimg-1" src="" alt="">
-        <div class="upload-hint">📷 이미지 변경</div>
+        <button class="upload-btn" onclick="triggerUp(1)">📷 변경</button>
         <input class="file-in" id="fin-1" type="file" accept="image/*" onchange="loadImg(1,this)">
       </div>
       <div class="cust-tbar-bg"><div class="cust-tbar" id="ctbar-1"></div></div>
     </div>
     <div class="seat" id="seat-2">
       <div class="bubble hidden" id="bub-2"></div>
-      <div class="cust-img-wrap" onclick="triggerUp(2)">
+      <div class="cust-img-wrap">
         <img class="cust-img" id="cimg-2" src="" alt="">
-        <div class="upload-hint">📷 이미지 변경</div>
+        <button class="upload-btn" onclick="triggerUp(2)">📷 변경</button>
         <input class="file-in" id="fin-2" type="file" accept="image/*" onchange="loadImg(2,this)">
       </div>
       <div class="cust-tbar-bg"><div class="cust-tbar" id="ctbar-2"></div></div>
@@ -541,9 +543,19 @@ function tick(){
 
 // ══════ 레일 ══════
 const SPEED=0.5;
+
+// 레일 클릭: 이벤트 위임 방식으로 한 번만 등록
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('rail-track').addEventListener('click',e=>{
+    const el=e.target.closest('.rsushi');
+    if(!el)return;
+    const id=parseInt(el.dataset.id);
+    if(!isNaN(id))serveItem(id);
+  });
+});
+
 function startRail(){
   cancelAnimationFrame(G.rafId);
-  const track=document.getElementById('rail-track');
   function frame(){
     const spd=G.buffs.slot?SPEED*0.75:SPEED;
     G.rail.forEach(r=>{ r.x-=spd; });
@@ -555,17 +567,31 @@ function startRail(){
 }
 function renderRail(){
   const track=document.getElementById('rail-track');
-  track.innerHTML='';
+  // DOM diff 방식: 기존 엘리먼트 재활용, 추가/삭제만 처리
+  const existing=new Map();
+  track.querySelectorAll('.rsushi').forEach(el=>existing.set(parseInt(el.dataset.id),el));
+  const currentIds=new Set(G.rail.map(r=>r.id));
+
+  // 없어진 것 제거
+  existing.forEach((el,id)=>{ if(!currentIds.has(id))el.remove(); });
+
+  // 위치 업데이트 or 새로 추가
   G.rail.forEach(item=>{
-    // 매칭 체크
     const matches=G.buffs.hint&&G.custs.some(c=>c&&sushiMatch(item,c));
-    const el=document.createElement('div');
-    el.className='rsushi';
-    el.style.left=item.x+'px';
-    const ingIcons=Object.entries(item.ings).map(([id])=>INGS.find(x=>x.id===id)?.i||'').join('');
-    el.innerHTML=`<div class="rplate${matches?' match':''}">${ingIcons||RICE[item.rice]?.i||'🍣'}</div><div class="rlabel">${item.name}</div>`;
-    el.onclick=()=>serveItem(item.id);
-    track.appendChild(el);
+    if(existing.has(item.id)){
+      const el=existing.get(item.id);
+      el.style.left=item.x+'px';
+      const plate=el.querySelector('.rplate');
+      if(plate)plate.className='rplate'+(matches?' match':'');
+    } else {
+      const el=document.createElement('div');
+      el.className='rsushi';
+      el.style.left=item.x+'px';
+      el.dataset.id=item.id;
+      const ingIcons=Object.entries(item.ings).map(([id])=>INGS.find(x=>x.id===id)?.i||'').join('');
+      el.innerHTML=`<div class="rplate${matches?' match':''}">${ingIcons||RICE[item.rice]?.i||'🍣'}</div><div class="rlabel">${item.name}</div>`;
+      track.appendChild(el);
+    }
   });
 }
 
