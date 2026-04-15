@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>🍣 스시야 이치방</title>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#f5ede0;
+  --wall:#d4956a;--wall2:#c07848;--wall3:#a85a30;
+  --counter:#8b5e3c;--counter2:#6a4228;--counter3:#4a2e18;
+  --rail:#c8a060;--rail2:#a07840;
+  --cream:#fdf6e8;--cream2:#f0e4cc;
+  --sage:#7aad6a;--sage2:#5a8d4a;--sage3:#3a6d2a;
+  --peach:#f0a080;--warm:#d4784a;--warm2:#b05828;
+  --red:#c83030;--green:#40a850;
+  --text:#2a1a0a;--text2:#5a3a20;--text3:#9a7a60;
+  --white:#fffdf5;--gold:#d4a820;
+  --shadow:rgba(80,40,10,.18);
+}
+html,body{height:100%;overflow:hidden;}
+body{
+  background:var(--bg);
+  font-family:'Noto Sans KR',sans-serif;
+  color:var(--text);
+  display:flex;flex-direction:column;
+  height:100vh;max-height:100vh;
+  overflow:hidden;
+}
+
+/* ══════════ 헤더 ══════════ */
+#header{
+  background:var(--wall3);
+  padding:6px 14px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+  box-shadow:0 3px 10px rgba(0,0,0,.25);
+  gap:8px;flex-wrap:wrap;
+}
+.h-shop{font-family:'Jua',sans-serif;font-size:15px;color:var(--cream);letter-spacing:.05em;}
+.h-stats{display:flex;gap:8px;align-items:center;}
+.h-chip{
+  display:flex;align-items:center;gap:4px;
+  background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 10px;font-size:12px;color:var(--cream);
+}
+.h-chip-val{font-family:'Jua',sans-serif;font-size:14px;}
+#timer{
+  font-family:'Jua',sans-serif;font-size:16px;color:var(--cream);
+  background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.2);
+  border-radius:20px;padding:4px 12px;
+}
+#timer.urgent{color:#ff8888;animation:urg .4s ease infinite alternate;}
+@keyframes urg{from{opacity:.7;}to{opacity:1;}}
+.day-badge{
+  font-family:'Jua',sans-serif;font-size:12px;
+  background:var(--gold);color:var(--text);
+  border-radius:20px;padding:3px 10px;
+}
+
+/* ══════════ 레스토랑 뷰 ══════════ */
+#restaurant{
+  flex:1;display:flex;flex-direction:column;
+  overflow:hidden;position:relative;
+  background:linear-gradient(180deg, #c8906a 0%, #b87850 30%, #a06840 100%);
+}
+
+/* 뒷벽 */
+#back-wall{
+  height:28%;flex-shrink:0;
+  background:linear-gradient(180deg,#c07848 0%,#a86030 100%);
+  position:relative;
+  border-bottom:4px solid var(--wall3);
+}
+#back-wall::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg,transparent 0,transparent 60px,rgba(0,0,0,.04) 60px,rgba(0,0,0,.04) 61px);
+}
+/* 메뉴판 */
+.menu-board{
+  position:absolute;top:8px;left:50%;transform:translateX(-50%);
+  background:#3a1808;border:3px solid #6a3010;border-radius:4px;
+  padding:4px 16px;font-family:'Jua',sans-serif;font-size:11px;
+  color:#f0c840;letter-spacing:.08em;white-space:nowrap;
+}
+
+/* ══════════ 손님 영역 ══════════ */
+#customers-area{
+  display:flex;align-items:flex-end;justify-content:space-around;
+  padding:0 4% 0;
+  height:54%;flex-shrink:0;
+  position:relative;
+}
+.customer-wrap{
+  display:flex;flex-direction:column;align-items:center;
+  position:relative;
+  width:30%;max-width:130px;
+}
+/* 손님 이미지/아바타 */
+.cust-avatar{
+  width:72px;height:90px;
+  object-fit:cover;object-position:top;
+  border-radius:10px 10px 0 0;
+  filter:drop-shadow(0 4px 8px rgba(0,0,0,.25));
+  display:block;
+}
+.cust-avatar-wrap{
+  position:relative;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;
+}
+.upload-hint{
+  position:absolute;bottom:0;left:0;right:0;
+  background:rgba(0,0,0,.5);color:#fff;
+  font-size:8px;text-align:center;padding:3px;
+  border-radius:0 0 4px 4px;opacity:0;transition:opacity .2s;
+}
+.cust-avatar-wrap:hover .upload-hint{opacity:1;}
+.cust-file-input{display:none;}
+.speech-bubble{
+  position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);
+  background:var(--white);border:2px solid var(--cream2);
+  border-radius:12px;padding:8px 10px;
+  font-size:10px;color:var(--text2);
+  min-width:110px;max-width:150px;
+  text-align:left;
+  box-shadow:0 4px 12px var(--shadow);
+  z-index:10;
+  transition:opacity .3s;
+}
+.speech-bubble::after{
+  content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  border:6px solid transparent;border-top-color:var(--cream2);
+}
+.speech-bubble::before{
+  content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  margin-top:-2px;
+  border:6px solid transparent;border-top-color:var(--white);z-index:1;
+}
+.speech-bubble.empty{opacity:0;pointer-events:none;}
+.speech-bubble.eating{background:#e8fce8;border-color:#a0d8a0;text-align:center;}
+.speech-bubble.eating::after{border-top-color:#a0d8a0;}
+.speech-bubble.eating::before{border-top-color:#e8fce8;}
+.speech-bubble.angry{background:#fce8e8;border-color:#d8a0a0;text-align:center;}
+.speech-bubble.angry::after{border-top-color:#d8a0a0;}
+.speech-bubble.angry::before{border-top-color:#fce8e8;}
+.speech-bubble.waiting{animation:float 2s ease-in-out infinite alternate;}
+@keyframes float{from{transform:translateX(-50%) translateY(0);}to{transform:translateX(-50%) translateY(-4px);}}
+/* 말풍선 내부 상세 주문 */
+.bub-title{font-size:11px;font-weight:700;color:var(--text);margin-bottom:5px;white-space:nowrap;}
+.bub-section{display:flex;align-items:flex-start;gap:4px;margin-bottom:3px;}
+.bub-label{font-size:8px;font-weight:700;color:var(--warm2);min-width:22px;padding-top:1px;letter-spacing:.04em;}
+.bub-val{font-size:11px;color:var(--text2);}
+.bub-ings{display:flex;flex-direction:column;gap:2px;}
+.bub-ing{display:flex;align-items:center;gap:3px;}
+.bub-ing-icon{font-size:14px;line-height:1;}
+.bub-ing-name{font-size:10px;color:var(--text2);font-weight:500;}
+.bub-ing-cnt{font-size:10px;font-weight:700;color:var(--red);}
+
+/* SVG 사람 */
+.customer-svg{
+  width:72px;height:100px;
+  filter:drop-shadow(0 4px 8px rgba(0,0,0,.2));
+}
+.customer-svg.happy .body-fill{fill:#6090d8;}
+.customer-svg.angry .body-fill{fill:#c06060;}
+.customer-svg.waiting .body-fill{fill:#7080c8;}
+/* 타이머 바 (손님 아래) */
+.cust-timer-wrap{
+  width:90%;height:4px;background:rgba(0,0,0,.15);
+  border-radius:2px;margin-top:2px;overflow:hidden;
+}
+.cust-timer-bar{height:4px;border-radius:2px;transition:width .5s,background .3s;}
+.cust-seat-num{font-size:9px;color:rgba(255,255,255,.5);margin-top:1px;}
+
+/* ══════════ 레일 (벨트 컨베이어) ══════════ */
+#rail-area{
+  height:52px;flex-shrink:0;
+  position:relative;
+  background:var(--rail);
+  border-top:3px solid var(--rail2);
+  border-bottom:3px solid var(--counter2);
+  overflow:hidden;
+}
+#rail-area::before,#rail-area::after{
+  content:'';position:absolute;top:0;bottom:0;width:30px;z-index:2;
+}
+#rail-area::before{left:0;background:linear-gradient(90deg,var(--rail),transparent);}
+#rail-area::after{right:0;background:linear-gradient(-90deg,var(--rail),transparent);}
+#rail-track{
+  position:absolute;top:0;bottom:0;left:0;right:0;
+  display:flex;align-items:center;
+}
+/* 레일 무늬 */
+#rail-area .rail-line{
+  position:absolute;top:50%;transform:translateY(-50%);
+  left:0;right:0;height:2px;background:rgba(255,255,255,.2);
+}
+.rail-sushi{
+  position:absolute;
+  display:flex;flex-direction:column;align-items:center;
+  cursor:pointer;transition:transform .12s;
+  z-index:3;
+}
+.rail-sushi:hover{transform:scale(1.15) translateY(-2px);}
+.rail-plate{
+  width:44px;height:44px;border-radius:50%;
+  background:var(--white);border:2px solid var(--cream2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;
+  box-shadow:0 3px 8px rgba(0,0,0,.2);
+  position:relative;
+}
+.rail-plate.matches{
+  border-color:var(--sage);
+  box-shadow:0 3px 12px rgba(90,141,74,.5);
+  animation:glow .6s ease-in-out infinite alternate;
+}
+@keyframes glow{from{box-shadow:0 3px 8px rgba(90,141,74,.3);}to{box-shadow:0 3px 16px rgba(90,141,74,.7);}}
+.rail-sushi-label{font-size:7px;color:var(--counter2);margin-top:1px;white-space:nowrap;font-weight:700;}
+/* 레일 클릭 힌트 */
+.rail-sushi.matches .rail-plate::after{
+  content:'✓';position:absolute;top:-6px;right:-6px;
+  width:16px;height:16px;border-radius:50%;
+  background:var(--sage);color:#fff;
+  font-size:9px;display:flex;align-items:center;justify-content:center;
+}
+
+/* ══════════ 카운터 (제작대) ══════════ */
+#counter{
+  flex-shrink:0;
+  background:var(--counter);
+  border-top:4px solid var(--counter3);
+  padding:8px 10px 6px;
+  min-height:0;
+}
+.counter-surface{
+  background:var(--counter2);
+  border-radius:8px;padding:8px 10px;
+  border:2px solid var(--counter3);
+}
+
+/* 스텝 탭 */
+#step-tabs{display:flex;gap:4px;margin-bottom:8px;}
+.step-tab{
+  flex:1;padding:5px 4px;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);
+  border-radius:6px;font-size:10px;font-weight:700;color:rgba(255,255,255,.5);
+  text-align:center;cursor:pointer;transition:all .15s;
+}
+.step-tab.active{background:var(--warm);border-color:var(--warm2);color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.2);}
+.step-tab.done{background:var(--sage2);border-color:var(--sage3);color:#fff;}
+.step-tab.locked{pointer-events:none;}
+
+/* 스텝 패널 */
+.step-panel{display:none;}
+.step-panel.active{display:block;}
+
+/* 버튼 그리드 */
+.choice-grid{display:flex;gap:5px;flex-wrap:wrap;}
+.choice-btn{
+  display:flex;flex-direction:column;align-items:center;gap:1px;
+  padding:5px 4px;min-width:50px;
+  background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.2);
+  border-radius:8px;cursor:pointer;transition:all .12s;
+  font-family:'Noto Sans KR',sans-serif;
+}
+.choice-btn:hover{background:rgba(255,255,255,.22);transform:translateY(-1px);}
+.choice-btn:active{transform:scale(.95);}
+.choice-btn.on{background:var(--warm);border-color:var(--warm2);}
+.choice-btn .c-icon{font-size:18px;line-height:1;}
+.choice-btn .c-name{font-size:8px;color:rgba(255,255,255,.7);}
+.choice-btn.on .c-name{color:#fff;font-weight:700;}
+.choice-btn .c-cnt{
+  position:absolute;top:-5px;right:-5px;
+  width:16px;height:16px;border-radius:50%;
+  background:var(--red);color:#fff;font-size:8px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+}
+.choice-btn{position:relative;}
+.choice-btn .c-remove{
+  position:absolute;top:-5px;left:-5px;
+  width:14px;height:14px;border-radius:50%;
+  background:rgba(200,48,48,.8);color:#fff;font-size:7px;font-weight:700;
+  cursor:pointer;display:none;align-items:center;justify-content:center;
+}
+.choice-btn.has-cnt .c-remove{display:flex;}
+
+/* 서빙 버튼 */
+#serve-row{display:flex;gap:6px;align-items:center;margin-top:6px;}
+#serve-btn{
+  flex:1;font-family:'Jua',sans-serif;font-size:14px;
+  padding:8px;border:none;border-radius:8px;
+  background:rgba(255,255,255,.15);color:rgba(255,255,255,.4);
+  cursor:not-allowed;transition:all .2s;
+}
+#serve-btn.ready{
+  background:var(--sage);color:#fff;cursor:pointer;
+  box-shadow:0 3px 0 var(--sage3),0 5px 14px rgba(58,109,42,.35);
+}
+#serve-btn.ready:hover{transform:translateY(-1px);box-shadow:0 4px 0 var(--sage3),0 6px 16px rgba(58,109,42,.4);}
+#serve-btn.ready:active{transform:translateY(1px);box-shadow:0 2px 0 var(--sage3);}
+#rst-btn{
+  font-size:11px;padding:7px 10px;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+  border-radius:8px;color:rgba(255,255,255,.5);cursor:pointer;
+  font-family:'Noto Sans KR',sans-serif;
+}
+#rst-btn:hover{background:rgba(255,255,255,.15);}
+
+/* 현재 제작 미리보기 */
+#craft-preview{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(0,0,0,.15);border-radius:6px;
+  padding:5px 8px;margin-bottom:6px;
+  min-height:38px;
+}
+.craft-item{font-size:16px;}
+.craft-empty{font-size:10px;color:rgba(255,255,255,.35);}
+#msg-bar{
+  font-size:10px;font-weight:700;text-align:center;
+  min-height:14px;color:rgba(255,255,255,.8);
+}
+
+/* ══════════ 상점 오버레이 ══════════ */
+#shop-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(42,26,10,.9);z-index:200;
+  flex-direction:column;align-items:center;justify-content:center;
+  padding:16px;
+}
+#shop-overlay.show{display:flex;}
+.shop-card{
+  background:var(--cream);border-radius:20px;
+  border:3px solid var(--cream2);
+  width:100%;max-width:400px;
+  box-shadow:0 8px 40px rgba(80,40,10,.4);
+  overflow:hidden;
+}
+.shop-header{
+  background:var(--wall3);padding:14px 18px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.shop-title{font-family:'Jua',sans-serif;font-size:18px;color:var(--cream);}
+.shop-money{font-family:'Jua',sans-serif;font-size:14px;color:var(--gold);}
+.shop-body{padding:14px;max-height:70vh;overflow-y:auto;}
+.shop-section{margin-bottom:14px;}
+.shop-sec-title{font-family:'Jua',sans-serif;font-size:12px;color:var(--text2);margin-bottom:8px;padding-left:2px;}
+.shop-items{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.shop-item{
+  background:var(--white);border:2px solid var(--cream2);border-radius:12px;
+  padding:10px;display:flex;flex-direction:column;gap:4px;
+}
+.shop-item.owned{border-color:var(--sage2);}
+.shop-item.cant{opacity:.4;}
+.si-icon{font-size:24px;}
+.si-name{font-size:11px;font-weight:700;color:var(--text);}
+.si-desc{font-size:9px;color:var(--text3);line-height:1.5;}
+.si-btn{
+  font-family:'Jua',sans-serif;font-size:10px;padding:5px 8px;
+  border:none;border-radius:8px;cursor:pointer;margin-top:2px;
+}
+.si-btn.buy{background:var(--sage);color:#fff;}
+.si-btn.buy:hover{background:var(--sage2);}
+.si-btn.owned{background:#d1fae5;color:var(--sage3);cursor:default;}
+.si-btn.cant{background:var(--cream2);color:var(--text3);cursor:not-allowed;}
+.shop-close{
+  font-family:'Jua',sans-serif;font-size:13px;
+  padding:10px 30px;background:var(--warm);border:none;
+  border-radius:50px;color:#fff;cursor:pointer;margin-top:4px;
+  box-shadow:0 3px 0 var(--warm2);
+}
+.shop-close:hover{transform:translateY(-1px);box-shadow:0 4px 0 var(--warm2);}
+
+/* 영업 끝 */
+#day-end{
+  display:none;position:fixed;inset:0;
+  background:rgba(42,26,10,.88);z-index:199;
+  flex-direction:column;align-items:center;justify-content:center;
+  padding:20px;
+}
+#day-end.show{display:flex;}
+.day-end-card{
+  background:var(--cream);border-radius:20px;
+  border:3px solid var(--cream2);padding:24px;
+  max-width:340px;width:100%;text-align:center;
+  box-shadow:0 8px 40px rgba(80,40,10,.4);
+}
+.day-end-title{font-family:'Jua',sans-serif;font-size:26px;color:var(--text);margin-bottom:4px;}
+.day-end-stars{font-size:30px;margin-bottom:14px;}
+.day-end-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px;}
+.des{background:var(--cream2);border-radius:10px;padding:10px;border:1.5px solid var(--cream3,#e0d0b8);}
+.des-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;}
+.des-val{font-family:'Jua',sans-serif;font-size:20px;color:var(--text);margin-top:2px;}
+.btn-row{display:flex;gap:8px;justify-content:center;}
+.big-btn{
+  font-family:'Jua',sans-serif;font-size:13px;
+  padding:10px 22px;border:none;border-radius:50px;cursor:pointer;
+}
+.big-btn.sage{background:var(--sage);color:#fff;box-shadow:0 3px 0 var(--sage3);}
+.big-btn.warm{background:var(--warm);color:#fff;box-shadow:0 3px 0 var(--warm2);}
+
+/* 토스트 */
+#toast{
+  position:fixed;top:56px;left:50%;transform:translateX(-50%);
+  font-size:11px;font-weight:700;
+  padding:7px 16px;border-radius:20px;
+  background:var(--wall3);color:var(--cream);
+  z-index:300;opacity:0;transition:opacity .2s;pointer-events:none;
+  white-space:nowrap;box-shadow:0 3px 10px rgba(0,0,0,.3);
+}
+#toast.show{opacity:1;}
+#toast.ok{background:var(--sage2);}
+#toast.ng{background:var(--red);}
+#toast.gold{background:var(--gold);color:var(--text);}
+</style>
+</head>
+<body>
+
+<!-- ══ 헤더 ══ -->
+<div id="header">
+  <div class="h-shop">🍣 이치방</div>
+  <div class="h-stats">
+    <div class="day-badge" id="day-badge">Day 1</div>
+    <div class="h-chip">💰 <span class="h-chip-val" id="h-money">0</span>원</div>
+    <div class="h-chip">😊 <span class="h-chip-val" id="h-happy">0</span></div>
+    <div class="h-chip">⭐ Lv.<span class="h-chip-val" id="h-level">1</span></div>
+  </div>
+  <div id="timer">1:00</div>
+</div>
+
+<!-- ══ 레스토랑 뷰 ══ -->
+<div id="restaurant">
+
+  <!-- 뒷벽 -->
+  <div id="back-wall">
+    <div class="menu-board">🍣 스시야 이치방 · 오마카세</div>
+  </div>
+
+  <!-- 손님 3명 -->
+  <div id="customers-area">
+    <div class="customer-wrap" id="seat-0">
+      <div class="speech-bubble empty" id="bubble-0"></div>
+      <div class="cust-avatar-wrap" onclick="triggerUpload(0)">
+        <img class="cust-avatar" id="cust-img-0" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 90'%3E%3Cellipse cx='36' cy='26' rx='20' ry='22' fill='%235070c8'/%3E%3Crect x='16' y='48' width='40' height='38' rx='8' fill='%234060b8'/%3E%3Cellipse cx='22' cy='84' rx='10' ry='8' fill='%23c03030'/%3E%3Cellipse cx='50' cy='84' rx='10' ry='8' fill='%23c03030'/%3E%3Ccircle cx='29' cy='24' r='3' fill='white'/%3E%3Ccircle cx='43' cy='24' r='3' fill='white'/%3E%3Ccircle cx='30' cy='25' r='1.5' fill='%23222'/%3E%3Ccircle cx='44' cy='25' r='1.5' fill='%23222'/%3E%3Cpath d='M30 36 Q36 41 42 36' stroke='white' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E" alt="손님1">
+        <div class="upload-hint">📷 클릭해서 변경</div>
+        <input class="cust-file-input" id="upload-0" type="file" accept="image/*" onchange="loadCustImg(0,this)">
+      </div>
+      <div class="cust-timer-wrap"><div class="cust-timer-bar" id="cbar-0" style="width:100%;background:var(--sage);"></div></div>
+    </div>
+    <div class="customer-wrap" id="seat-1">
+      <div class="speech-bubble empty" id="bubble-1"></div>
+      <div class="cust-avatar-wrap" onclick="triggerUpload(1)">
+        <img class="cust-avatar" id="cust-img-1" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 90'%3E%3Cellipse cx='36' cy='26' rx='22' ry='23' fill='%235070c8'/%3E%3Crect x='14' y='49' width='44' height='38' rx='8' fill='%234060b8'/%3E%3Cellipse cx='21' cy='85' rx='11' ry='9' fill='%23c03030'/%3E%3Cellipse cx='51' cy='85' rx='11' ry='9' fill='%23c03030'/%3E%3Ccircle cx='28' cy='24' r='3.5' fill='white'/%3E%3Ccircle cx='44' cy='24' r='3.5' fill='white'/%3E%3Ccircle cx='29' cy='25' r='1.8' fill='%23222'/%3E%3Ccircle cx='45' cy='25' r='1.8' fill='%23222'/%3E%3Cpath d='M29 37 Q36 43 43 37' stroke='white' stroke-width='2.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E" alt="손님2">
+        <div class="upload-hint">📷 클릭해서 변경</div>
+        <input class="cust-file-input" id="upload-1" type="file" accept="image/*" onchange="loadCustImg(1,this)">
+      </div>
+      <div class="cust-timer-wrap"><div class="cust-timer-bar" id="cbar-1" style="width:100%;background:var(--sage);"></div></div>
+    </div>
+    <div class="customer-wrap" id="seat-2">
+      <div class="speech-bubble empty" id="bubble-2"></div>
+      <div class="cust-avatar-wrap" onclick="triggerUpload(2)">
+        <img class="cust-avatar" id="cust-img-2" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 90'%3E%3Cellipse cx='36' cy='25' rx='19' ry='21' fill='%235070c8'/%3E%3Crect x='17' y='46' width='38' height='38' rx='8' fill='%234060b8'/%3E%3Cellipse cx='22' cy='82' rx='10' ry='8' fill='%23c03030'/%3E%3Cellipse cx='50' cy='82' rx='10' ry='8' fill='%23c03030'/%3E%3Ccircle cx='29' cy='23' r='3' fill='white'/%3E%3Ccircle cx='43' cy='23' r='3' fill='white'/%3E%3Ccircle cx='30' cy='24' r='1.5' fill='%23222'/%3E%3Ccircle cx='44' cy='24' r='1.5' fill='%23222'/%3E%3Cpath d='M30 35 Q36 40 42 35' stroke='white' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E" alt="손님3">
+        <div class="upload-hint">📷 클릭해서 변경</div>
+        <input class="cust-file-input" id="upload-2" type="file" accept="image/*" onchange="loadCustImg(2,this)">
+      </div>
+      <div class="cust-timer-wrap"><div class="cust-timer-bar" id="cbar-2" style="width:100%;background:var(--sage);"></div></div>
+    </div>
+  </div>
+
+  <!-- 레일 (벨트 컨베이어) -->
+  <div id="rail-area">
+    <div class="rail-line"></div>
+    <div id="rail-track"></div>
+  </div>
+
+</div><!-- restaurant end -->
+
+<!-- ══ 카운터 (제작대) ══ -->
+<div id="counter">
+  <div class="counter-surface">
+    <!-- 현재 만들고 있는 것 미리보기 -->
+    <div id="craft-preview">
+      <span class="craft-empty">아직 아무것도 없어요 — 아래에서 선택해요!</span>
+    </div>
+
+    <!-- 스텝 탭 -->
+    <div id="step-tabs">
+      <div class="step-tab active" id="stab-0" onclick="goTab(0)">1.밥</div>
+      <div class="step-tab locked" id="stab-1" onclick="goTab(1)">2.재료</div>
+      <div class="step-tab locked" id="stab-2" onclick="goTab(2)">3.소스</div>
+      
+    </div>
+
+    <!-- 패널 0: 밥 -->
+    <div class="step-panel active" id="panel-0">
+      <div class="choice-grid">
+        <div class="choice-btn" onclick="setRice('white')" data-r="white"><span class="c-icon">🍚</span><span class="c-name">흰밥</span></div>
+        <div class="choice-btn" onclick="setRice('vinegar')" data-r="vinegar"><span class="c-icon">🟡</span><span class="c-name">식초밥</span></div>
+        <div class="choice-btn" onclick="setRice('black')" data-r="black"><span class="c-icon">⚫</span><span class="c-name">흑초밥</span></div>
+        <div class="choice-btn" onclick="setRice('none')" data-r="none"><span class="c-icon">🫙</span><span class="c-name">군함말이</span></div>
+      </div>
+    </div>
+    <!-- 패널 1: 재료 -->
+    <div class="step-panel" id="panel-1">
+      <div class="choice-grid" id="ing-grid"></div>
+    </div>
+    <!-- 패널 2: 소스 -->
+    <div class="step-panel" id="panel-2">
+      <div class="choice-grid">
+        <div class="choice-btn" onclick="toggleSauce('soy')" id="sc-soy"><span class="c-icon">🫙</span><span class="c-name">간장</span></div>
+        <div class="choice-btn" onclick="toggleSauce('wasabi')" id="sc-wasabi"><span class="c-icon">💚</span><span class="c-name">와사비</span></div>
+        <div class="choice-btn" onclick="toggleSauce('ponzu')" id="sc-ponzu"><span class="c-icon">🍋</span><span class="c-name">폰즈</span></div>
+        <div class="choice-btn" onclick="toggleSauce('spicy')" id="sc-spicy"><span class="c-icon">🌶️</span><span class="c-name">스파이시</span></div>
+        <div class="choice-btn" onclick="toggleSauce('mayo')" id="sc-mayo"><span class="c-icon">🥛</span><span class="c-name">마요</span></div>
+        <div class="choice-btn" onclick="toggleSauce('none')" id="sc-none"><span class="c-icon">✖️</span><span class="c-name">소스없음</span></div>
+      </div>
+
+    </div>
+
+
+    <!-- 서빙 -->
+    <div id="serve-row">
+      <button id="serve-btn" onclick="serveOrder()">🍱 레일에 올리기!</button>
+      <button id="rst-btn" onclick="resetOrder()">🗑</button>
+    </div>
+    <div id="msg-bar"></div>
+  </div>
+</div>
+
+<!-- ══ 영업 마감 ══ -->
+<div id="day-end">
+  <div class="day-end-card">
+    <div class="day-end-title">오늘 영업 종료!</div>
+    <div class="day-end-stars" id="de-stars">⭐⭐⭐</div>
+    <div class="day-end-stats">
+      <div class="des"><div class="des-label">오늘 수익</div><div class="des-val" id="de-money">0원</div></div>
+      <div class="des"><div class="des-label">만족 손님</div><div class="des-val" id="de-happy">0명</div></div>
+      <div class="des"><div class="des-label">최고 콤보</div><div class="des-val" id="de-combo">0</div></div>
+      <div class="des"><div class="des-label">정확도</div><div class="des-val" id="de-acc">0%</div></div>
+    </div>
+    <div class="btn-row">
+      <button class="big-btn sage" onclick="openShop()">🛒 상점</button>
+      <button class="big-btn warm" onclick="nextDay()">🌅 다음 날</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 상점 ══ -->
+<div id="shop-overlay">
+  <div class="shop-card">
+    <div class="shop-header">
+      <div class="shop-title">🛒 상점</div>
+      <div class="shop-money">💰 <span id="shop-money">0</span>원</div>
+    </div>
+    <div class="shop-body" id="shop-body"></div>
+    <div style="padding:10px 14px;text-align:center;">
+      <button class="shop-close" onclick="closeShop()">🍣 상점 닫기</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════
+// 데이터
+// ══════════════════════════════
+const RICE={white:{l:'흰밥',i:'🍚'},vinegar:{l:'식초밥',i:'🟡'},black:{l:'흑초밥',i:'⚫'},none:{l:'군함',i:'🫙'}};
+const SAUCES={soy:{l:'간장',i:'🫙'},wasabi:{l:'와사비',i:'💚'},ponzu:{l:'폰즈',i:'🍋'},spicy:{l:'스파이시',i:'🌶️'},mayo:{l:'마요',i:'🥛'},none:{l:'없음',i:'✖️'}};
+const TEMPS={cold:'❄️ 차갑게',room:'🌡️ 상온',warm:'🔥 따뜻'};
+const AGINGS={fresh:'✨ 생물',aged1:'🕐 1일',aged3:'🕒 3일'};
+const INGS=[
+  {id:'salmon',i:'🐟',n:'연어'},{id:'tuna',i:'🔴',n:'참치'},{id:'shrimp',i:'🦐',n:'새우'},
+  {id:'eel',i:'🟫',n:'장어'},{id:'scallop',i:'⚪',n:'관자'},{id:'egg',i:'🟡',n:'계란'},
+  {id:'crab',i:'🦀',n:'게살'},{id:'sea_urchin',i:'🟠',n:'성게'},{id:'salmon_roe',i:'🔶',n:'연어알'},
+  {id:'avocado',i:'🥑',n:'아보카도'},{id:'squid',i:'🦑',n:'오징어'},{id:'octopus',i:'🐙',n:'문어'},
+];
+const ING_PRICE={salmon:500,tuna:600,shrimp:400,eel:700,scallop:800,egg:200,crab:600,sea_urchin:1000,salmon_roe:900,avocado:300,squid:350,octopus:450};
+const MENUS=[
+  {n:'연어',    r:'white',   i:{salmon:2},              s:'soy',    t:'cold', a:'fresh',e:'😊',base:3000},
+  {n:'참치',    r:'vinegar', i:{tuna:2},                s:'wasabi', t:'cold', a:'fresh',e:'😋',base:3200},
+  {n:'새우',    r:'white',   i:{shrimp:2},              s:'soy',    t:'cold', a:'fresh',e:'😄',base:2800},
+  {n:'계란',    r:'white',   i:{egg:2},                 s:'none',   t:'room', a:'fresh',e:'😃',base:2400},
+  {n:'장어',    r:'black',   i:{eel:2},                 s:'soy',    t:'warm', a:'aged1',e:'🤩',base:3600},
+  {n:'연어+아보',r:'vinegar',i:{salmon:1,avocado:1},   s:'ponzu',  t:'cold', a:'fresh',e:'😍',base:4000},
+  {n:'게살군함', r:'none',   i:{crab:2},                s:'mayo',   t:'cold', a:'fresh',e:'🥰',base:3400},
+  {n:'성게군함', r:'none',   i:{sea_urchin:2},          s:'soy',    t:'cold', a:'aged1',e:'😲',base:5000},
+  {n:'연어알군함',r:'none',  i:{salmon_roe:2},          s:'soy',    t:'cold', a:'fresh',e:'😯',base:4500},
+  {n:'관자',    r:'black',   i:{scallop:2},             s:'ponzu',  t:'cold', a:'aged3',e:'🧐',base:4800},
+  {n:'해물모둠', r:'vinegar', i:{tuna:1,salmon:1,shrimp:1},s:'spicy',t:'cold',a:'fresh',e:'🤑',base:6000},
+  {n:'오마카세', r:'vinegar', i:{tuna:1,sea_urchin:1,salmon_roe:1},s:'ponzu',t:'cold',a:'aged3',e:'👑',base:8000},
+];
+
+const SHOP_ITEMS=[
+  {id:'tip',    icon:'💸',name:'단골 손님',   desc:'성공 서빙 시 +500원 팁',     price:5000, owned:false},
+  {id:'timer',  icon:'⏰',name:'느긋한 손님', desc:'손님 타이머 +20초',          price:8000, owned:false},
+  {id:'slot',   icon:'🪑',name:'추가 좌석',   desc:'레일 슬롯 +2개 추가',        price:10000,owned:false},
+  {id:'combo',  icon:'🔥',name:'콤보 보너스', desc:'3콤보마다 +2,000원',         price:12000,owned:false},
+  {id:'hint',   icon:'💡',name:'주문 강조',   desc:'일치하는 초밥이 레일에서 빛남',price:7000,owned:false},
+  {id:'rail',   icon:'🎠',name:'빠른 레일',   desc:'레일 속도 조절 가능',        price:9000, owned:false},
+];
+
+// ══════════════════════════════
+// 게임 상태
+// ══════════════════════════════
+const G={
+  day:1, money:0, happy:0, angry:0, level:1,
+  combo:0, bestCombo:0, totalOrders:0, correctOrders:0,
+  timerSec:180, timerInt:null,
+  customers:[null,null,null], // 3 자리 고정
+  customerTimers:[null,null,null],
+  hints:3, hardMode:false,
+  buffs:{tip:false,timer:false,slot:false,combo:false,hint:false,rail:false},
+  // 현재 제작
+  rice:null,ings:{},sauces:new Set(),temp:null,aging:null,
+  curTab:0,
+  // 레일
+  railItems:[], railAnim:null, railX:0,
+  // 하루 통계
+  dayMoney:0, dayHappy:0,
+};
+function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+
+// ══════════════════════════════
+// 시작
+// ══════════════════════════════
+window.onload=()=>{
+  buildIngGrid();
+  startDay();
+};
+
+function startDay(){
+  G.timerSec=60;
+  G.dayMoney=0; G.dayHappy=0;
+  G.totalOrders=0; G.correctOrders=0;
+  G.combo=0; G.bestCombo=0;
+  G.railItems=[];
+  document.getElementById('day-badge').textContent='Day '+G.day;
+  document.getElementById('day-end').classList.remove('show');
+  G.timerInt=setInterval(tick,1000);
+  // 레일 애니메이션
+  startRailAnim();
+  // 손님 스폰
+  setTimeout(()=>spawnCustomer(0),1000);
+  setTimeout(()=>spawnCustomer(1),2500);
+  setTimeout(()=>spawnCustomer(2),4000);
+  updateHUD();
+}
+
+function tick(){
+  G.timerSec--;
+  const m=Math.floor(G.timerSec/60),s=G.timerSec%60;
+  const el=document.getElementById('timer');
+  el.textContent=m+':'+(s<10?'0':'')+s;
+  if(G.timerSec<=30)el.classList.add('urgent');
+  if(G.timerSec<=0){clearInterval(G.timerInt);endDay();}
+}
+
+function endDay(){
+  // 모든 손님 타이머 정리
+  [0,1,2].forEach(s=>{if(G.customerTimers[s])clearInterval(G.customerTimers[s]);});
+  cancelAnimationFrame(G.railAnim);
+  const acc=G.totalOrders?Math.round(G.correctOrders/G.totalOrders*100):0;
+  const stars=G.dayHappy>=8?'⭐⭐⭐':G.dayHappy>=4?'⭐⭐':'⭐';
+  document.getElementById('de-stars').textContent=stars;
+  document.getElementById('de-money').textContent=G.dayMoney.toLocaleString()+'원';
+  document.getElementById('de-happy').textContent=G.dayHappy+'명';
+  document.getElementById('de-combo').textContent=G.bestCombo+'콤보';
+  document.getElementById('de-acc').textContent=acc+'%';
+  document.getElementById('day-end').classList.add('show');
+}
+
+function nextDay(){
+  G.day++;
+  G.timerSec=Math.max(40,60-G.day*3); // 날마다 시간 줄어듦
+  document.getElementById('day-end').classList.remove('show');
+  document.getElementById('timer').classList.remove('urgent');
+  // 손님 초기화
+  [0,1,2].forEach(s=>{G.customers[s]=null;setBubble(s,'empty');setCustColor(s,'normal');});
+  G.railItems=[];
+  renderRail();
+  startDay();
+}
+
+// ══════════════════════════════
+// 레일 애니메이션
+// ══════════════════════════════
+const RAIL_SPEED=0.4;
+let railPos=window.innerWidth;
+
+function startRailAnim(){
+  const track=document.getElementById('rail-track');
+  function frame(){
+    G.railItems.forEach(item=>{
+      item.x-=RAIL_SPEED*(G.buffs.rail?0.6:1);
+    });
+    // 화면 밖 나간 것 제거
+    G.railItems=G.railItems.filter(item=>{
+      if(item.x<-60){
+        // 아직 안 먹은 초밥이면 패널티 없음
+        return false;
+      }
+      return true;
+    });
+    renderRail();
+    G.railAnim=requestAnimationFrame(frame);
+  }
+  G.railAnim=requestAnimationFrame(frame);
+}
+
+function addToRail(sushiData){
+  const track=document.getElementById('rail-track');
+  const startX=track.offsetWidth+60;
+  G.railItems.push({...sushiData, x:startX, id:Date.now()});
+}
+
+function renderRail(){
+  const track=document.getElementById('rail-track');
+  track.innerHTML='';
+  G.railItems.forEach(item=>{
+    // 어느 손님 주문과 일치하는지 체크
+    let matches=false;
+    if(G.buffs.hint){
+      G.customers.forEach((c,si)=>{
+        if(c&&matchesSushi(item,c)){matches=true;}
+      });
+    }
+    const el=document.createElement('div');
+    el.className='rail-sushi';
+    el.style.left=item.x+'px';
+    el.style.top='4px';
+    el.innerHTML=`<div class="rail-plate${matches?' matches':''}">${item.displayIcon}</div><div class="rail-sushi-label">${item.name}</div>`;
+    // 클릭 → 손님에게 서빙
+    el.onclick=()=>serveFromRail(item.id);
+    track.appendChild(el);
+  });
+}
+
+// ══════════════════════════════
+// 손님 시스템
+// ══════════════════════════════
+function getLvMenus(){
+  if(G.level<=2)return MENUS.slice(0,5);
+  if(G.level<=4)return MENUS.slice(0,9);
+  return MENUS;
+}
+function getTimeLimit(){return G.buffs.timer?40000:22000;}
+
+function spawnCustomer(seat){
+  const menus=getLvMenus();
+  const menu=menus[rnd(0,menus.length-1)];
+  G.customers[seat]={menu,timeLeft:getTimeLimit(),maxTime:getTimeLimit()};
+  setBubble(seat,'order',menu);
+  setCustColor(seat,'normal');
+  if(G.customerTimers[seat])clearInterval(G.customerTimers[seat]);
+  G.customerTimers[seat]=setInterval(()=>{
+    const c=G.customers[seat];if(!c)return;
+    c.timeLeft-=200;
+    const pct=Math.max(0,c.timeLeft/c.maxTime*100);
+    const bc=pct>55?'var(--sage)':pct>25?'var(--warm)':'var(--red)';
+    const bar=document.getElementById('cbar-'+seat);
+    if(bar){bar.style.width=pct+'%';bar.style.background=bc;}
+    if(c.timeLeft<=0){clearInterval(G.customerTimers[seat]);loseCustomer(seat);}
+  },200);
+}
+
+function loseCustomer(seat){
+  G.customers[seat]=null;
+  G.angry++;G.combo=0;
+  setBubble(seat,'angry');
+  setCustColor(seat,'angry');
+  updateHUD();
+  setTimeout(()=>{
+    setBubble(seat,'empty');
+    setCustColor(seat,'normal');
+    const bar=document.getElementById('cbar-'+seat);
+    if(bar){bar.style.width='100%';bar.style.background='var(--sage)';}
+    // 새 손님 등장
+    setTimeout(()=>spawnCustomer(seat),1500);
+  },1500);
+  toast('😤 손님이 화내며 가셨어요!','ng');
+}
+
+function setBubble(seat,type,menu){
+  const el=document.getElementById('bubble-'+seat);
+  if(type==='empty'){el.className='speech-bubble empty';el.innerHTML='';return;}
+  if(type==='order'&&menu){
+    // 재료 아이콘+이름+개수 크게
+    const ingRows=Object.entries(menu.i).map(([id,cnt])=>{
+      const ing=INGS.find(x=>x.id===id);
+      return ing?`<div class="bub-ing"><span class="bub-ing-icon">${ing.i}</span><span class="bub-ing-name">${ing.n}</span><span class="bub-ing-cnt">×${cnt}</span></div>`:'';
+    }).join('');
+    const riceInfo=RICE[menu.r];
+    const sauceInfo=SAUCES[menu.s];
+    el.className='speech-bubble waiting';
+    el.innerHTML=`
+      <div class="bub-title">${menu.n} 주세요!</div>
+      <div class="bub-section">
+        <span class="bub-label">밥</span>
+        <span class="bub-val">${riceInfo.i} ${riceInfo.l}</span>
+      </div>
+      <div class="bub-section">
+        <span class="bub-label">재료</span>
+        <div class="bub-ings">${ingRows}</div>
+      </div>
+      <div class="bub-section">
+        <span class="bub-label">소스</span>
+        <span class="bub-val">${sauceInfo.i} ${sauceInfo.l}</span>
+      </div>
+    `;
+    return;
+  }
+  if(type==='eating'){el.className='speech-bubble eating';el.innerHTML='<div style="font-size:18px;">😋</div><div style="font-size:10px;">맛있어요!</div>';return;}
+  if(type==='angry'){el.className='speech-bubble angry';el.innerHTML='<div style="font-size:18px;">😡</div><div style="font-size:10px;">너무 오래 기다렸어요!</div>';return;}
+}
+// 이미지 업로드
+const custImgSrc=[null,null,null]; // 커스텀 이미지 저장
+function triggerUpload(seat){
+  document.getElementById('upload-'+seat).click();
+}
+function loadCustImg(seat,input){
+  if(!input.files||!input.files[0])return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    custImgSrc[seat]=e.target.result;
+    document.getElementById('cust-img-'+seat).src=e.target.result;
+    toast('📷 이미지 변경 완료!','ok');
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function setCustColor(seat,state){
+  const img=document.getElementById('cust-img-'+seat);
+  if(!img)return;
+  if(state==='normal'){img.style.filter='drop-shadow(0 4px 8px rgba(0,0,0,.25))';}
+  else if(state==='eating'){img.style.filter='drop-shadow(0 4px 8px rgba(0,0,0,.25)) brightness(1.1) hue-rotate(100deg)';}
+  else if(state==='angry'){img.style.filter='drop-shadow(0 4px 8px rgba(0,0,0,.25)) brightness(0.9) hue-rotate(-30deg) saturate(1.5)';}
+}
+
+// ══════════════════════════════
+// 서빙 (레일에서 손님에게)
+// ══════════════════════════════
+function serveFromRail(itemId){
+  const idx=G.railItems.findIndex(x=>x.id===itemId);
+  if(idx<0)return;
+  const item=G.railItems[idx];
+  // 어느 손님 주문과 일치?
+  let served=false;
+  [0,1,2].forEach(seat=>{
+    if(served)return;
+    const c=G.customers[seat];
+    if(!c)return;
+    if(matchesSushi(item,c)){
+      served=true;
+      G.railItems.splice(idx,1);
+      clearInterval(G.customerTimers[seat]);
+      // 성공!
+      G.correctOrders++;G.totalOrders++;
+      G.combo++;if(G.combo>G.bestCombo)G.bestCombo=G.combo;
+      let price=c.menu.base;
+      Object.entries(item.ings||{}).forEach(([id,cnt])=>{price+=(ING_PRICE[id]||0)*cnt;});
+      if(G.buffs.tip)price+=500;
+      if(G.buffs.combo&&G.combo%3===0){price+=2000;toast(`🔥 ${G.combo}콤보! +2,000원!`,'gold');}
+      G.money+=price;G.dayMoney+=price;G.happy++;G.dayHappy++;
+      setBubble(seat,'eating');
+      setCustColor(seat,'eating');
+      updateHUD();
+      toast(`${c.menu.e} 완벽! +${price.toLocaleString()}원 ✨`,'ok');
+      const bar=document.getElementById('cbar-'+seat);
+      if(bar){bar.style.width='100%';bar.style.background='var(--sage)';}
+      setTimeout(()=>{
+        setBubble(seat,'empty');setCustColor(seat,'normal');
+        G.customers[seat]=null;
+        setTimeout(()=>spawnCustomer(seat),1200);
+      },2000);
+      // 레벨업
+      if((G.happy)%8===0&&G.level<10){G.level++;updateHUD();toast(`🎉 레벨업! Lv.${G.level}`,'gold');}
+    }
+  });
+  if(!served){
+    // 아무도 주문 안 한 초밥 — 틀린 서빙으로 처리하지 않고 그냥 레일에서 제거
+    G.railItems.splice(idx,1);
+    toast('❓ 주문에 없는 초밥이에요','ng');
+    G.totalOrders++;
+  }
+}
+
+function matchesSushi(item,customer){
+  const m=customer.menu;
+  if(item.rice!==m.r)return false;
+  const oK=Object.keys(m.i),iK=Object.keys(item.ings||{});
+  if(oK.length!==iK.length)return false;
+  for(const k of oK){if((item.ings[k]||0)!==m.i[k])return false;}
+  if(item.sauce!==m.s)return false;
+  return true;
+}
+
+// ══════════════════════════════
+// 제작 시스템
+// ══════════════════════════════
+function buildIngGrid(){
+  const g=document.getElementById('ing-grid');g.innerHTML='';
+  INGS.forEach(ing=>{
+    const btn=document.createElement('div');
+    btn.className='choice-btn';btn.id='cb-'+ing.id;
+    btn.innerHTML=`<span class="c-icon">${ing.i}</span><span class="c-name">${ing.n}</span><span class="c-cnt" id="cnt-${ing.id}" style="display:none;"></span><span class="c-remove" id="rm-${ing.id}" style="display:none;" onclick="removeIng('${ing.id}',event)">✕</span>`;
+    btn.onclick=()=>addIng(ing.id);
+    g.appendChild(btn);
+  });
+}
+
+function goTab(t){
+  // 잠긴 탭은 무시
+  const tab=document.getElementById('stab-'+t);
+  if(tab.classList.contains('locked'))return;
+  G.curTab=t;
+  document.querySelectorAll('.step-tab').forEach((el,i)=>el.classList.toggle('active',i===t));
+  document.querySelectorAll('.step-panel').forEach((el,i)=>el.classList.toggle('active',i===t));
+}
+
+function unlockTab(t){
+  const tab=document.getElementById('stab-'+t);
+  tab.classList.remove('locked');
+}
+
+function setRice(r){
+  G.rice=r;
+  document.querySelectorAll('[data-r]').forEach(b=>b.classList.toggle('on',b.dataset.r===r));
+  unlockTab(1);goTab(1);
+  updatePreview();
+}
+function addIng(id){
+  const total=Object.values(G.ings).reduce((a,b)=>a+b,0);
+  if(total>=3)return;
+  G.ings[id]=(G.ings[id]||0)+1;
+  updateIngUI();updatePreview();
+  // 재료 1개 이상이면 소스 탭 열기
+  if(Object.values(G.ings).reduce((a,b)=>a+b,0)>=1){unlockTab(2);}
+}
+function removeIng(id,e){
+  e.stopPropagation();
+  if(!G.ings[id])return;
+  G.ings[id]--;if(!G.ings[id])delete G.ings[id];
+  updateIngUI();updatePreview();
+}
+function updateIngUI(){
+  INGS.forEach(ing=>{
+    const cnt=G.ings[ing.id]||0;
+    const ce=document.getElementById('cnt-'+ing.id);
+    const re=document.getElementById('rm-'+ing.id);
+    const btn=document.getElementById('cb-'+ing.id);
+    if(ce){ce.textContent=cnt;ce.style.display=cnt?'flex':'none';}
+    if(re)re.style.display=cnt?'flex':'none';
+    if(btn)btn.classList.toggle('has-cnt',cnt>0);
+  });
+  const total=Object.values(G.ings).reduce((a,b)=>a+b,0);
+  document.getElementById('stab-1').textContent='2.재료'+(total?'('+total+')':'');
+}
+function toggleSauce(s){
+  if(G.sauces.has(s)){G.sauces.delete(s);}else{G.sauces.add(s);}
+  document.querySelectorAll('[id^="sc-"]').forEach(el=>{
+    const sid=el.id.replace('sc-','');
+    el.classList.toggle('on',G.sauces.has(sid));
+  });
+  updatePreview();
+}
+function setTemp(t){
+  G.temp=t;
+  document.querySelectorAll('[data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+  checkDone();updatePreview();
+}
+function setAging(a){
+  G.aging=a;
+  document.querySelectorAll('[data-a]').forEach(b=>b.classList.toggle('on',b.dataset.a===a));
+  checkDone();updatePreview();
+}
+function checkDone(){
+  const ready=G.rice&&Object.keys(G.ings).length>0&&G.sauces.size>0;
+  const btn=document.getElementById('serve-btn');
+  btn.classList.toggle('ready',!!ready);
+}
+
+function updatePreview(){
+  const wrap=document.getElementById('craft-preview');
+  const riceInfo=G.rice?RICE[G.rice]:null;
+  const ingList=Object.entries(G.ings);
+  if(!riceInfo&&ingList.length===0){
+    wrap.innerHTML='<span class="craft-empty">아직 아무것도 없어요 — 아래에서 선택해요!</span>';
+    return;
+  }
+  let icons='';
+  if(riceInfo)icons+=`<span class="craft-item" title="${riceInfo.l}">${riceInfo.i}</span>`;
+  ingList.forEach(([id,cnt])=>{
+    const ing=INGS.find(x=>x.id===id);
+    if(ing)for(let i=0;i<cnt;i++)icons+=`<span class="craft-item">${ing.i}</span>`;
+  });
+  if(G.sauces.size)icons+=`<span class="craft-item">${[...G.sauces].map(s=>SAUCES[s]?.i||'').join('')}</span>`;
+  if(G.temp)icons+=`<span style="font-size:11px;color:rgba(255,255,255,.6);">${TEMPS[G.temp]}</span>`;
+  if(G.aging)icons+=`<span style="font-size:11px;color:rgba(255,255,255,.6);">${AGINGS[G.aging]}</span>`;
+  wrap.innerHTML=icons;
+}
+
+function serveOrder(){
+  if(!G.rice||Object.keys(G.ings).length===0||G.sauces.size===0){
+    toast('아직 초밥이 완성되지 않았어요!','ng');return;
+  }
+  // 주문서에 맞는 손님 이름 찾기
+  const ingList=Object.entries(G.ings);
+  const ingIcons=ingList.map(([id])=>INGS.find(x=>x.id===id)?.i||'').join('');
+  const name=ingList.length>1?ingList.map(([id])=>INGS.find(x=>x.id===id)?.n||'').join('+'):(INGS.find(x=>x.id===ingList[0]?.[0])?.n||'초밥');
+  const sushiData={
+    rice:G.rice,ings:{...G.ings},sauce:[...G.sauces][0]||'none',
+    temp:G.temp,aging:G.aging,
+    displayIcon:ingIcons||RICE[G.rice]?.i||'🍣',
+    name:name,
+  };
+  addToRail(sushiData);
+  G.totalOrders++;
+  toast('🚂 레일에 올렸어요!','');
+  resetOrder();
+}
+
+function resetOrder(){
+  G.rice=null;G.ings={};G.sauces=new Set();G.temp=null;G.aging=null;G.curTab=0;
+  document.querySelectorAll('[data-r]').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('[id^="sc-"]').forEach(b=>b.classList.remove('on'));
+  ['stab-1','stab-2'].forEach(id=>document.getElementById(id).classList.add('locked'));
+  document.getElementById('stab-1').textContent='2.재료';
+  updateIngUI();checkDone();updatePreview();
+  goTab(0);
+  document.querySelectorAll('.step-tab').forEach((t,i)=>{
+    t.classList.toggle('active',i===0);
+    t.classList.toggle('done',false);
+  });
+}
+
+// ══════════════════════════════
+// 상점
+// ══════════════════════════════
+function openShop(){
+  document.getElementById('shop-money').textContent=G.money.toLocaleString();
+  const body=document.getElementById('shop-body');
+  body.innerHTML=`<div class="shop-section">
+    <div class="shop-sec-title">🛒 업그레이드</div>
+    <div class="shop-items">
+      ${SHOP_ITEMS.map(item=>{
+        const canBuy=!item.owned&&G.money>=item.price;
+        return `<div class="shop-item${item.owned?' owned':!canBuy?' cant':''}">
+          <div class="si-icon">${item.icon}</div>
+          <div class="si-name">${item.name}</div>
+          <div class="si-desc">${item.desc}</div>
+          <button class="si-btn ${item.owned?'owned':canBuy?'buy':'cant'}" onclick="buyItem('${item.id}')">
+            ${item.owned?'✓ 구매완료':canBuy?'💰 '+item.price.toLocaleString()+'원':'💸 '+item.price.toLocaleString()+'원'}
+          </button>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+  document.getElementById('shop-overlay').classList.add('show');
+}
+function closeShop(){document.getElementById('shop-overlay').classList.remove('show');}
+function buyItem(id){
+  const item=SHOP_ITEMS.find(x=>x.id===id);
+  if(!item||item.owned||G.money<item.price)return;
+  G.money-=item.price;item.owned=true;
+  G.buffs[id]=true;
+  updateHUD();openShop();
+  toast(`${item.icon} "${item.name}" 구매 완료!`,'ok');
+}
+
+// ══════════════════════════════
+// HUD
+// ══════════════════════════════
+function updateHUD(){
+  document.getElementById('h-money').textContent=G.money.toLocaleString();
+  document.getElementById('h-happy').textContent=G.happy;
+  document.getElementById('h-level').textContent=G.level;
+}
+
+// ══════════════════════════════
+// 토스트
+// ══════════════════════════════
+let _tt=null;
+function toast(msg,cls){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.className='show '+(cls||'');
+  if(_tt)clearTimeout(_tt);
+  _tt=setTimeout(()=>el.className='',2400);
+}
+</script>
+</body>
+</html>
