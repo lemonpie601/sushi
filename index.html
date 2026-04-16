@@ -1011,26 +1011,38 @@ function toast(msg,cls){
 // ── PWA ──
 if('serviceWorker' in navigator){
   const swCode=`
-    self.addEventListener('install',e=>{self.skipWaiting();});
+    const CACHE='dango-v1776298767';
+    self.addEventListener('install',e=>{
+      self.skipWaiting();
+    });
     self.addEventListener('activate',e=>{
+      // 이전 캐시 전부 삭제 → 항상 최신 버전
       e.waitUntil(caches.keys().then(keys=>Promise.all(keys.map(k=>caches.delete(k)))));
       self.clients.claim();
     });
     self.addEventListener('fetch',e=>{
+      // 네트워크 우선 → 실패 시 캐시
       e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)));
     });
   `;
   const blob=new Blob([swCode],{type:'application/javascript'});
-  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
+  const url=URL.createObjectURL(blob);
+  navigator.serviceWorker.register(url).then(()=>{
+    console.log('🍡 당고집 PWA 등록 완료');
+  }).catch(e=>console.log('SW 등록 실패(로컬파일에서는 정상):',e));
 }
+
+// ── iOS 홈화면 추가 안내 ──
 window.addEventListener('load',()=>{
   const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
-  if(isIOS&&!window.navigator.standalone&&!sessionStorage.getItem('pwa')){
-    sessionStorage.setItem('pwa','1');
+  const isStandalone=window.navigator.standalone;
+  const shown=sessionStorage.getItem('pwa-hint');
+  if(isIOS&&!isStandalone&&!shown){
+    sessionStorage.setItem('pwa-hint','1');
     setTimeout(()=>{
       const el=document.createElement('div');
-      el.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#5a3018;color:#ffecd8;padding:10px 16px;border-radius:14px;font-size:12px;font-family:Jua,sans-serif;z-index:9999;text-align:center;box-shadow:0 4px 16px rgba(0,0,0,.3);max-width:260px;line-height:1.7;';
-      el.innerHTML='📲 홈 화면에 추가하면 앱처럼 사용 가능!<br><span style="font-size:10px;opacity:.7;">공유버튼 → 홈 화면에 추가</span>';
+      el.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#6a4228;color:#fff4e8;padding:10px 16px;border-radius:14px;font-size:12px;font-family:Jua,sans-serif;z-index:9999;text-align:center;box-shadow:0 4px 16px rgba(0,0,0,.3);max-width:260px;line-height:1.6;';
+      el.innerHTML='📲 홈 화면에 추가하면<br>앱처럼 사용할 수 있어요!<br><span style="font-size:10px;opacity:.7;">하단 공유버튼 → 홈 화면에 추가</span>';
       el.onclick=()=>el.remove();
       document.body.appendChild(el);
       setTimeout(()=>el&&el.remove(),5000);
