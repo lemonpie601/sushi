@@ -311,6 +311,27 @@ body{
   );
 }
 
+/* 탭 */
+#bench-tabs{
+  display:flex;gap:4px;flex-shrink:0;position:relative;z-index:1;
+}
+.btab{
+  flex:1;font-family:'Jua',sans-serif;font-size:12px;
+  padding:7px 8px;border:none;border-radius:10px;
+  background:rgba(255,255,255,.1);
+  color:rgba(255,220,170,.55);
+  cursor:pointer;transition:all .15s;
+  border:1.5px solid rgba(255,255,255,.1);
+}
+.btab.on{
+  background:rgba(255,255,255,.22);
+  color:#ffecd8;font-weight:700;
+  border-color:rgba(255,255,255,.3);
+}
+.btab.disabled{opacity:.35;cursor:not-allowed;}
+.btab-panel{display:none;}
+.btab-panel.on{display:block;}
+
 /* 서빙+초기화 한 줄 */
 #serve-rst-row{display:flex;gap:6px;position:relative;z-index:1;}
 #serve-btn{
@@ -543,12 +564,22 @@ input.hidden-file{display:none;}
 
 <!-- 제작대 -->
 <div id="bench">
+  <!-- 서빙+초기화 -->
   <div id="serve-rst-row">
     <button id="serve-btn" onclick="doServe()">🍱 서빙!</button>
     <button id="rst-btn" onclick="resetCraft()">🗑</button>
   </div>
-  <div class="bench-section">
-    <div class="bench-lbl">소스</div>
+  <!-- 탭 -->
+  <div id="bench-tabs">
+    <button class="btab on" id="btab-dango" onclick="switchTab('dango')">🍡 당고</button>
+    <button class="btab" id="btab-sauce" onclick="switchTab('sauce')">🍯 소스</button>
+  </div>
+  <!-- 당고 패널 -->
+  <div class="btab-panel on" id="panel-dango">
+    <div class="pick-row" id="dango-row"></div>
+  </div>
+  <!-- 소스 패널 -->
+  <div class="btab-panel" id="panel-sauce">
     <div class="pick-row" id="sauce-row">
       <div class="sauce-btn" onclick="setSauce('mitarashi')" data-s="mitarashi"><span class="sauce-emoji">🍯</span><span class="sauce-name">미타라시</span></div>
       <div class="sauce-btn" onclick="setSauce('kinako')" data-s="kinako"><span class="sauce-emoji">🟡</span><span class="sauce-name">키나코</span></div>
@@ -558,10 +589,6 @@ input.hidden-file{display:none;}
       <div class="sauce-btn" onclick="setSauce('caramel')" data-s="caramel"><span class="sauce-emoji">🧇</span><span class="sauce-name">캐러멜</span></div>
       <div class="sauce-btn" onclick="setSauce('plain')" data-s="plain"><span class="sauce-emoji">✖️</span><span class="sauce-name">없음</span></div>
     </div>
-  </div>
-  <div class="bench-section">
-    <div class="bench-lbl">당고 종류</div>
-    <div class="pick-row" id="dango-row"></div>
   </div>
 </div>
 
@@ -798,7 +825,9 @@ function addDango(id){
   if(G.curBalls.length===3){
     G.doneSkewers.push([...G.curBalls]);
     G.curBalls=[];
-    toast(`🍡 ${G.doneSkewers.length}번째 꼬치 완성! 계속 만들거나 소스 골라서 서빙해요!`,'ok');
+    toast(`🍡 ${G.doneSkewers.length}번째 꼬치 완성!`,'ok');
+    // 소스 탭으로 자동 이동
+    switchTab('sauce');
   }
   updateCraftDisplay();checkReady();
 }
@@ -878,9 +907,17 @@ function doServe(){
   setTimeout(()=>{showBubble('hidden');setCustImg('normal');setTbar(100,'var(--sage2)');if(G.sec>0)setTimeout(spawnCust,1500);},1800);
   resetCraft();
 }
+function switchTab(tab){
+  document.querySelectorAll('.btab').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.btab-panel').forEach(p=>p.classList.remove('on'));
+  document.getElementById('btab-'+tab).classList.add('on');
+  document.getElementById('panel-'+tab).classList.add('on');
+}
+
 function resetCraft(){
   G.curBalls=[];G.doneSkewers=[];G.sauce=null;
   document.querySelectorAll('[data-s]').forEach(b=>b.classList.remove('sel'));
+  switchTab('dango');
   updateCraftDisplay();checkReady();
 }
 
