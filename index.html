@@ -172,12 +172,14 @@ body{
 /* ════ 제작 디스플레이 ════ */
 #craft-display{
   flex-shrink:0;
+  height:90px; /* 고정 높이 — 내용 바뀌어도 레이아웃 안 밀림 */
   background:var(--white);
   border-top:3px solid var(--peach2);
   border-bottom:2px solid var(--cream3);
-  padding:6px 14px 5px;
-  display:flex;flex-direction:column;align-items:center;
+  padding:5px 14px 4px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:3px;
+  overflow:hidden;
 }
 #craft-status{
   font-family:'Jua',sans-serif;font-size:11px;color:var(--text3);
@@ -188,8 +190,9 @@ body{
 #craft-skewer-area{
   display:flex;align-items:center;justify-content:center;
   gap:10px;
-  min-height:54px;
+  height:44px; /* 고정 */
   position:relative;width:100%;
+  overflow:hidden;
 }
 /* 현재 제작중인 꼬치 */
 #craft-current{
@@ -238,8 +241,9 @@ body{
 }
 /* 완성된 꼬치들 */
 #done-skewers{
-  display:flex;gap:5px;align-items:center;flex-wrap:wrap;justify-content:center;
-  min-height:18px;
+  display:flex;gap:5px;align-items:center;flex-wrap:nowrap;justify-content:center;
+  height:18px; /* 고정 */
+  overflow:hidden;
 }
 .done-sk{
   font-size:13px;
@@ -256,9 +260,9 @@ body{
   padding:8px 10px;
   display:flex;flex-direction:column;gap:6px;
   overflow-y:auto;
-  /* 모바일: 화면의 최대 45% */
-  max-height:45vh;
-  /* iOS 바닥 safe area */
+  /* 화면의 42% 고정 — store+craft-display가 나머지 차지 */
+  height:42vh;
+  max-height:42vh;
   padding-bottom:max(10px, env(safe-area-inset-bottom));
 }
 /* 서빙 + 초기화 */
