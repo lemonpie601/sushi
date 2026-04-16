@@ -75,7 +75,7 @@ body{
 
 /* ════ 가게 뷰 (손님) ════ */
 #store{
-  flex:1;min-height:80px;
+  flex:1;min-height:60px;
   position:relative;
   overflow:hidden;
   background:linear-gradient(180deg,#f5d8c0 0%,#e8c8a8 60%,#d4a870 100%);
@@ -117,8 +117,8 @@ body{
   display:flex;flex-direction:column;align-items:center;
 }
 #cust-img{
-  width:clamp(80px,22vw,120px);
-  height:clamp(100px,28vw,150px);
+  width:clamp(100px,28vw,150px);
+  height:clamp(130px,36vw,190px);
   object-fit:contain;object-position:center bottom;
   display:block;
   filter:drop-shadow(0 3px 8px rgba(0,0,0,.2));
@@ -126,7 +126,7 @@ body{
 }
 #cust-img.happy{filter:drop-shadow(0 3px 8px rgba(0,0,0,.2)) brightness(1.1) saturate(1.3);}
 #cust-img.angry{filter:drop-shadow(0 3px 8px rgba(0,0,0,.2)) saturate(2) hue-rotate(-20deg) brightness(.85);}
-#cust-tbar-wrap{width:clamp(80px,22vw,120px);height:5px;background:rgba(0,0,0,.1);border-radius:3px;overflow:hidden;margin-top:2px;}
+#cust-tbar-wrap{width:clamp(100px,28vw,150px);height:5px;background:rgba(0,0,0,.1);border-radius:3px;overflow:hidden;margin-top:2px;}
 #cust-tbar{height:5px;border-radius:3px;transition:width .3s,background .3s;background:var(--sage2);}
 
 /* 말풍선 */
@@ -172,7 +172,7 @@ body{
 /* ════ 제작 디스플레이 ════ */
 #craft-display{
   flex-shrink:0;
-  height:88px;
+  height:100px;
   background:var(--white);
   border-top:3px solid var(--peach2);
   border-bottom:2px solid var(--cream3);
@@ -195,8 +195,8 @@ body{
   top:50%;left:0;right:0;
   transform:translateY(-50%);
   display:flex;align-items:center;justify-content:center;
-  height:50px;
-  overflow:hidden;
+  height:56px;
+  overflow:visible;
 }
 /* 완성된 꼬치들 — 아래에 고정 */
 #done-skewers{
@@ -215,6 +215,33 @@ body{
 }
 @keyframes doneAnim{from{transform:scale(0);}to{transform:scale(1);}}
 
+/* 꼬치 막대 구조 */
+#craft-current{display:flex;flex-direction:column;align-items:center;}
+#craft-stick-wrap{
+  position:relative;
+  display:flex;align-items:center;
+  height:48px;
+}
+#craft-stick-bg{
+  width:148px;height:8px;
+  border-radius:4px;
+  background:linear-gradient(90deg,#f0d890,#c8a040);
+  box-shadow:0 2px 4px rgba(0,0,0,.15);
+  flex-shrink:0;
+}
+#craft-handle{
+  width:12px;height:22px;border-radius:3px;
+  background:linear-gradient(180deg,#a06030,#7a4020);
+  margin-left:3px;flex-shrink:0;
+  box-shadow:1px 2px 4px rgba(0,0,0,.25);
+}
+#craft-balls-wrap{
+  position:absolute;
+  left:6px;top:50%;transform:translateY(-50%);
+  display:flex;align-items:center;gap:2px;
+  pointer-events:none;
+}
+
 /* ════ 제작대 (선택 버튼) ════ */
 #bench{
   flex-shrink:0;
@@ -223,8 +250,8 @@ body{
   display:flex;flex-direction:column;gap:6px;
   overflow-y:auto;
   /* 화면의 42% 고정 — store+craft-display가 나머지 차지 */
-  height:42vh;
-  max-height:42vh;
+  height:55vh;
+  max-height:55vh;
   padding-bottom:max(10px, env(safe-area-inset-bottom));
 }
 /* 서빙 + 초기화 */
@@ -733,9 +760,8 @@ function updateCraftDisplay(){
   const emptyCount=totalSlots-allBalls.length;
   let ballsHTML=allBalls.map(b=>`<span class="craft-ball">${b.emoji}</span>`).join('');
   if(target>0 && done<target){
-    const sz=Math.round(Math.min(30, Math.max(22, window.innerWidth*0.07)));
     for(let i=0;i<emptyCount;i++){
-      ballsHTML+=`<span class="craft-ball-empty"><svg width="${sz}" height="${sz}" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"><circle cx="15" cy="15" r="12" fill="none" stroke="rgba(180,120,80,.3)" stroke-width="2" stroke-dasharray="4 3"/></svg></span>`;
+      ballsHTML+=`<span class="craft-ball-empty"><svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"><circle cx="18" cy="18" r="14" fill="none" stroke="rgba(160,100,60,.35)" stroke-width="2.5" stroke-dasharray="5 4"/></svg></span>`;
     }
   }
   ballsWrap.innerHTML=ballsHTML;
