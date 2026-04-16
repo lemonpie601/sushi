@@ -1,0 +1,25 @@
+{
+  "name": "당고집",
+  "short_name": "당고집",
+  "description": "귀여운 당고 가게 경영 게임 🍡",
+  "start_url": "/sushi/dango.html",
+  "scope": "/sushi/",
+  "display": "standalone",
+  "background_color": "#fef3e8",
+  "theme_color": "#5a3018",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/sushi/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/sushi/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

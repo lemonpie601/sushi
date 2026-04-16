@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <rect width="192" height="192" rx="42" fill="#fef3e8"/>
+  <rect width="192" height="192" rx="42" fill="url(#bg)"/>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fff8f0"/>
+      <stop offset="100%" stop-color="#fde8c8"/>
+    </linearGradient>
+  </defs>
+  <!-- 꼬치 막대 -->
+  <rect x="30" y="92" width="132" height="10" rx="5" fill="#d4a030"/>
+  <rect x="154" y="80" width="10" height="34" rx="4" fill="#7a4020"/>
+  <!-- 당고 3개 -->
+  <circle cx="62" cy="97" r="26" fill="#ffb3c6"/>
+  <circle cx="62" cy="97" r="26" fill="url(#p1)"/>
+  <circle cx="96" cy="97" r="26" fill="#a8d48a"/>
+  <circle cx="96" cy="97" r="26" fill="url(#p2)"/>
+  <circle cx="130" cy="97" r="26" fill="#ffecd8"/>
+  <circle cx="130" cy="97" r="26" fill="url(#p3)"/>
+  <defs>
+    <radialGradient id="p1" cx=".35" cy=".3"><stop offset="0%" stop-color="white" stop-opacity=".5"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+    <radialGradient id="p2" cx=".35" cy=".3"><stop offset="0%" stop-color="white" stop-opacity=".5"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+    <radialGradient id="p3" cx=".35" cy=".3"><stop offset="0%" stop-color="white" stop-opacity=".5"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+  </defs>
+  <!-- 가게 이름 -->
+  <text x="96" y="152" font-family="sans-serif" font-size="22" font-weight="bold" fill="#5a3018" text-anchor="middle">당고집</text>
+</svg>
