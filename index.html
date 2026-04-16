@@ -92,11 +92,7 @@ body{
 /* 가게 배경 — 벽 */
 #store-bg{
   position:absolute;inset:0;
-  background:linear-gradient(180deg,
-    #f0c8a0 0%,#e8b888 25%,#dda870 45%,
-    #c89050 48%,#b87838 50%,
-    #d4a060 50%,#c89050 100%
-  );
+  background:linear-gradient(180deg,#f0c8a0 0%,#e8b888 40%,#e0a870 100%);
 }
 /* 벽 나무판자 느낌 */
 #store-bg::before{
@@ -109,10 +105,10 @@ body{
 }
 /* 카운터 상판 */
 #counter-top{
-  position:absolute;bottom:50%;left:0;right:0;height:12px;
+  position:absolute;bottom:0;left:0;right:0;height:12px;
   background:linear-gradient(180deg,#f0e0a0,#d4a840,#b88020);
   border-top:2px solid #f8f0c0;
-  box-shadow:0 4px 14px rgba(0,0,0,.2);
+  box-shadow:0 -2px 10px rgba(0,0,0,.15);
   z-index:2;
 }
 /* 간판 */
@@ -139,7 +135,7 @@ body{
 /* 손님 + 말풍선 */
 #customer-area{
   position:absolute;
-  bottom:52%;left:0;right:0;
+  bottom:10px;left:0;right:0;
   display:flex;justify-content:center;align-items:flex-end;
   gap:10px;padding:0 14px;
   z-index:4;
@@ -240,10 +236,11 @@ body{
   height:46px;
 }
 #craft-stick-bg{
-  width:144px;height:8px;border-radius:4px;
+  height:8px;border-radius:4px;
   background:linear-gradient(90deg,#f8e890,#d4a030);
   box-shadow:0 2px 6px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.4);
   flex-shrink:0;
+  transition:width .15s;
 }
 #craft-handle{
   width:11px;height:22px;border-radius:3px;
@@ -258,13 +255,13 @@ body{
   pointer-events:none;
 }
 .craft-ball{
-  font-size:32px;line-height:1;
+  font-size:clamp(26px,8vw,36px);line-height:1;
   animation:ballPop .2s cubic-bezier(.34,1.56,.64,1);
   filter:drop-shadow(0 2px 3px rgba(0,0,0,.15));
 }
 .craft-ball-empty{
   display:inline-flex;align-items:center;justify-content:center;
-  width:34px;height:34px;
+  width:clamp(28px,8vw,36px);height:clamp(28px,8vw,36px);
 }
 @keyframes ballPop{
   0%{transform:scale(0) translateY(6px);opacity:0;}
@@ -562,6 +559,8 @@ input.hidden-file{display:none;}
       <div class="sauce-btn" onclick="setSauce('kinako')" data-s="kinako"><span class="sauce-emoji">🟡</span><span class="sauce-name">키나코</span></div>
       <div class="sauce-btn" onclick="setSauce('anko')" data-s="anko"><span class="sauce-emoji">🫘</span><span class="sauce-name">팥앙금</span></div>
       <div class="sauce-btn" onclick="setSauce('matcha')" data-s="matcha"><span class="sauce-emoji">🍵</span><span class="sauce-name">말차</span></div>
+      <div class="sauce-btn" onclick="setSauce('choco')" data-s="choco"><span class="sauce-emoji">🍫</span><span class="sauce-name">초코소스</span></div>
+      <div class="sauce-btn" onclick="setSauce('caramel')" data-s="caramel"><span class="sauce-emoji">🧇</span><span class="sauce-name">캐러멜</span></div>
       <div class="sauce-btn" onclick="setSauce('plain')" data-s="plain"><span class="sauce-emoji">✖️</span><span class="sauce-name">없음</span></div>
     </div>
   </div>
@@ -581,12 +580,18 @@ const DANGOS=[
   {id:'strawb', emoji:'🔴',name:'딸기 당고'},
   {id:'yuzu',   emoji:'🟡',name:'유자 당고'},
   {id:'mochi',  emoji:'🟤',name:'모치 당고'},
+  {id:'choco',  emoji:'🍫',name:'초코 당고'},
+  {id:'melon',  emoji:'🟩',name:'멜론 당고'},
+  {id:'grape',  emoji:'🍇',name:'포도 당고'},
+  {id:'caramel',emoji:'🧇',name:'카라멜 당고'},
 ];
 const SAUCES={
   mitarashi:{label:'미타라시',emoji:'🍯'},
   kinako:{label:'키나코',emoji:'🟡'},
   anko:{label:'팥앙금',emoji:'🫘'},
   matcha:{label:'말차',emoji:'🍵'},
+  choco:{label:'초코소스',emoji:'🍫'},
+  caramel:{label:'캐러멜',emoji:'🧇'},
   plain:{label:'없음',emoji:'✖️'},
 };
 const MENUS=[
@@ -605,6 +610,17 @@ const MENUS=[
   {skewer:3,dangos:{white:1,green:1,pink:1},sauce:'plain',base:5800},
   {skewer:2,dangos:{yuzu:1,sakura:1,strawb:1},sauce:'plain',base:4400},
   {skewer:1,dangos:{mochi:3},sauce:'kinako',base:2400},
+  {skewer:1,dangos:{choco:3},sauce:'choco',base:2600},
+  {skewer:1,dangos:{grape:3},sauce:'plain',base:2400},
+  {skewer:1,dangos:{melon:3},sauce:'plain',base:2400},
+  {skewer:1,dangos:{caramel:3},sauce:'caramel',base:2800},
+  {skewer:2,dangos:{choco:3},sauce:'choco',base:4800},
+  {skewer:2,dangos:{strawb:1,choco:1,pink:1},sauce:'choco',base:5000},
+  {skewer:1,dangos:{white:1,choco:1,sesame:1},sauce:'kinako',base:3000},
+  {skewer:2,dangos:{grape:1,melon:1,sakura:1},sauce:'plain',base:4600},
+  {skewer:3,dangos:{choco:3},sauce:'caramel',base:6400},
+  {skewer:1,dangos:{melon:1,yuzu:1,green:1},sauce:'matcha',base:3200},
+  {skewer:3,dangos:{strawb:1,grape:1,melon:1},sauce:'plain',base:6200},
 ];
 const SHOP_ITEMS=[
   {id:'tip',icon:'💸',name:'단골 손님',desc:'서빙 성공 시 +300원 팁',price:4000},
@@ -802,10 +818,15 @@ function updateCraftDisplay(){
   if(!target){statusEl.innerHTML='꼬치 개수를 먼저 골라요!';}
   else if(done>=target){statusEl.innerHTML=`✅ 꼬치 ${target}개 완성! <em>소스 선택 후 서빙!</em>`;}
   else{statusEl.innerHTML=`🍡 ${done+1}번째 꼬치 — <em>${G.curBalls.length}/3</em>개`;}
+  // 볼 크기 동적 계산
+  const bsz=Math.min(36,Math.max(26,window.innerWidth*0.08));
+  const stickW=3*bsz+24;
+  document.getElementById('craft-stick-bg').style.width=stickW+'px';
+
   let ballsHTML=G.curBalls.map(b=>`<span class="craft-ball">${b.emoji}</span>`).join('');
   if(target>0&&done<target){
     for(let i=0;i<3-G.curBalls.length;i++){
-      ballsHTML+=`<span class="craft-ball-empty"><svg width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="14" fill="none" stroke="rgba(200,140,80,.3)" stroke-width="2.5" stroke-dasharray="5 4"/></svg></span>`;
+      ballsHTML+=`<span class="craft-ball-empty"><svg width="${bsz}" height="${bsz}" viewBox="0 0 34 34"><circle cx="17" cy="17" r="14" fill="none" stroke="rgba(200,140,80,.35)" stroke-width="2.5" stroke-dasharray="5 4"/></svg></span>`;
     }
   }
   ballsWrap.innerHTML=ballsHTML;
