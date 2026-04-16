@@ -1015,7 +1015,7 @@ function toast(msg,cls){
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
+    navigator.serviceWorker.register('./sw.js')
       .then(reg => console.log('SW 등록 성공', reg))
       .catch(err => console.log('SW 등록 실패', err));
   });
