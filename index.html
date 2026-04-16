@@ -1008,44 +1008,33 @@ function toast(msg,cls){
 </script>
 
 <script>
-// ── Service Worker 등록 (PWA) ──
+// ── PWA ──
 if('serviceWorker' in navigator){
   const swCode=`
-    const CACHE='dango-v1';
-    const ASSETS=['/'];
-    self.addEventListener('install',e=>{
-      e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)));
-      self.skipWaiting();
-    });
+    self.addEventListener('install',e=>{self.skipWaiting();});
     self.addEventListener('activate',e=>{
       e.waitUntil(caches.keys().then(keys=>Promise.all(keys.map(k=>caches.delete(k)))));
       self.clients.claim();
     });
     self.addEventListener('fetch',e=>{
-      e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))); 
-   });
+      e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)));
+    });
   `;
   const blob=new Blob([swCode],{type:'application/javascript'});
-  const url=URL.createObjectURL(blob);
-  navigator.serviceWorker.register(url).then(()=>{
-    console.log('🍡 당고집 PWA 등록 완료');
-  }).catch(e=>console.log('SW 등록 실패(로컬파일에서는 정상):',e));
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
 }
-
 window.addEventListener('load',()=>{
   const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
-  const isStandalone=window.navigator.standalone;
-  const shown=sessionStorage.getItem('pwa-hint');
-  if(isIOS&&!isStandalone&&!shown){
-    sessionStorage.setItem('pwa-hint','1');
+  if(isIOS&&!window.navigator.standalone&&!sessionStorage.getItem('pwa')){
+    sessionStorage.setItem('pwa','1');
     setTimeout(()=>{
       const el=document.createElement('div');
-      el.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#6a4228;color:#fff4e8;padding:10px 16px;border-radius:14px;font-size:12px;font-family:Jua,sans-serif;z-index:9999;text-align:center;box-shadow:0 4px 16px rgba(0,0,0,.3);max-width:260px;line-height:1.6;';
-      el.innerHTML='📲 홈 화면에 추가하면<br>앱처럼 사용할 수 있어요!<br><span style="font-size:10px;opacity:.7;">하단 공유버튼 → 홈 화면에 추가</span>';
+      el.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#5a3018;color:#ffecd8;padding:10px 16px;border-radius:14px;font-size:12px;font-family:Jua,sans-serif;z-index:9999;text-align:center;box-shadow:0 4px 16px rgba(0,0,0,.3);max-width:260px;line-height:1.7;';
+      el.innerHTML='📲 홈 화면에 추가하면 앱처럼 사용 가능!<br><span style="font-size:10px;opacity:.7;">공유버튼 → 홈 화면에 추가</span>';
       el.onclick=()=>el.remove();
       document.body.appendChild(el);
       setTimeout(()=>el&&el.remove(),5000);
-    },2000);
+    },2500);
   }
 });
 </script>
