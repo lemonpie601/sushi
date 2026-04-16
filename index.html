@@ -596,6 +596,8 @@ function setCustImg(state){
 
 // ══════ 시작 ══════
 window.onload=()=>{
+  // 저장된 이미지 먼저 불러오기
+  loadSavedImages();
   buildDangoRow();
   setCustImg('normal');
   updateCraftDisplay();
@@ -918,10 +920,33 @@ function loadImg(id,state,input){
   r.onload=e=>{
     const c=CUSTS.find(x=>x.id===id);if(!c)return;
     c.imgs[state]=e.target.result;
-    const th=document.getElementById(`th-${id}-${state}`);if(th)th.src=e.target.result;
-    toast('📷 이미지 저장됨!','ok');
+    // localStorage에 저장
+    try{localStorage.setItem('img_'+id+'_'+state, e.target.result);}catch(e){}
+    const th=document.getElementById('th-'+id+'-'+state);if(th)th.src=e.target.result;
+    // 현재 게임 중인 캐릭터면 바로 반영
+    setCustImg(document.getElementById('cust-img').className||'normal');
+    toast('📷 이미지 저장됨! (영구 보관)','ok');
   };
   r.readAsDataURL(input.files[0]);
+}
+
+function saveAllImages(){
+  CUSTS.forEach(c=>{
+    ['normal','happy','angry'].forEach(state=>{
+      if(c.imgs[state]){
+        try{localStorage.setItem('img_'+c.id+'_'+state, c.imgs[state]);}catch(e){}
+      }
+    });
+  });
+}
+
+function loadSavedImages(){
+  CUSTS.forEach(c=>{
+    ['normal','happy','angry'].forEach(state=>{
+      const saved=localStorage.getItem('img_'+c.id+'_'+state);
+      if(saved) c.imgs[state]=saved;
+    });
+  });
 }
 function toggleActive(id){
   const c=CUSTS.find(x=>x.id===id);if(c)c.active=!c.active;
@@ -929,6 +954,10 @@ function toggleActive(id){
 }
 function delCust(id){
   if(CUSTS.length<=1)return;
+  // localStorage 이미지도 삭제
+  ['normal','happy','angry'].forEach(state=>{
+    try{localStorage.removeItem('img_'+id+'_'+state);}catch(e){}
+  });
   CUSTS=CUSTS.filter(x=>x.id!==id);renderSettingsOv();
 }
 function addCust(){
@@ -937,6 +966,7 @@ function addCust(){
   const h=HAIR_COLORS[i],s=SKIN_COLORS[i%SKIN_COLORS.length];
   CUSTS.push({id,name:'새 손님',imgs:{normal:null,happy:null,angry:null},
     defImgs:{normal:makeSVG(h,s,'normal'),happy:makeSVG(h,s,'happy'),angry:makeSVG(h,s,'angry')},active:true});
+  // 새 손님 id를 localStorage에 등록해두기 (나중에 이미지 저장용)
   renderSettingsOv();toast('👤 손님 추가됨!','ok');
 }
 
@@ -960,18 +990,18 @@ function toast(msg,cls){
 // ── Service Worker 등록 (PWA) ──
 if('serviceWorker' in navigator){
   const swCode=`
-    const CACHE='dango-v1';
-    const ASSETS=['/'];
+    const CACHE='dango-v1776298767';
     self.addEventListener('install',e=>{
-      e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)));
       self.skipWaiting();
     });
     self.addEventListener('activate',e=>{
-      e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));
+      // 이전 캐시 전부 삭제 → 항상 최신 버전
+      e.waitUntil(caches.keys().then(keys=>Promise.all(keys.map(k=>caches.delete(k)))));
       self.clients.claim();
     });
     self.addEventListener('fetch',e=>{
-      e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));
+      // 네트워크 우선 → 실패 시 캐시
+      e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)));
     });
   `;
   const blob=new Blob([swCode],{type:'application/javascript'});
