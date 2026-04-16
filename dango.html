@@ -827,7 +827,7 @@ function updateCraftDisplay(){
   else{statusEl.innerHTML=`🍡 ${done+1}번째 꼬치 — <em>${G.curBalls.length}/3</em>개`;}
   // 볼 크기 동적 계산
   const bsz=Math.min(36,Math.max(26,window.innerWidth*0.08));
-  const stickW=3*bsz+60;
+  const stickW=3*bsz+24;
   document.getElementById('craft-stick-bg').style.width=stickW+'px';
 
   let ballsHTML=G.curBalls.map(b=>`<span class="craft-ball">${b.emoji}</span>`).join('');
