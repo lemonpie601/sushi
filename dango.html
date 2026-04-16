@@ -548,14 +548,6 @@ input.hidden-file{display:none;}
     <button id="rst-btn" onclick="resetCraft()">🗑</button>
   </div>
   <div class="bench-section">
-    <div class="bench-lbl">꼬치 개수</div>
-    <div class="pick-row" id="skewer-row">
-      <div class="skewer-btn" onclick="setSkewer(1)" data-sk="1"><span class="skewer-icon">🍡</span><span class="skewer-name">1개</span></div>
-      <div class="skewer-btn" onclick="setSkewer(2)" data-sk="2"><span class="skewer-icon">🍡🍡</span><span class="skewer-name">2개</span></div>
-      <div class="skewer-btn" onclick="setSkewer(3)" data-sk="3"><span class="skewer-icon">🍡🍡🍡</span><span class="skewer-name">3개</span></div>
-    </div>
-  </div>
-  <div class="bench-section">
     <div class="bench-lbl">소스</div>
     <div class="pick-row" id="sauce-row">
       <div class="sauce-btn" onclick="setSauce('mitarashi')" data-s="mitarashi"><span class="sauce-emoji">🍯</span><span class="sauce-name">미타라시</span></div>
@@ -690,7 +682,7 @@ const G={
   total:0,correct:0,sec:60,tint:null,
   cust:null,ctimer:null,
   buffs:{tip:false,timer:false,combo:false,hint:false},
-  skewer:0,curBalls:[],doneSkewers:[],sauce:null,
+  curBalls:[],doneSkewers:[],sauce:null,
   dayMoney:0,dayHappy:0,
 };
 const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
@@ -798,22 +790,15 @@ function buildDangoRow(){
     row.appendChild(btn);
   });
 }
-function setSkewer(n){
-  G.skewer=n;G.curBalls=[];G.doneSkewers=[];
-  document.querySelectorAll('[data-sk]').forEach(b=>b.classList.toggle('sel',+b.dataset.sk===n));
-  updateCraftDisplay();checkReady();
-}
+// setSkewer 제거됨 — 개수 자동
 function addDango(id){
-  if(!G.skewer){toast('꼬치 개수를 먼저 골라요!','ng');return;}
-  if(G.doneSkewers.length>=G.skewer){toast('꼬치 완성! 소스를 골라요.','ng');return;}
   if(G.curBalls.length>=3){toast('당고 3개가 꽉 찼어요!','ng');return;}
   const d=DANGOS.find(x=>x.id===id);if(!d)return;
   G.curBalls.push({id,emoji:d.emoji,name:d.name});
   if(G.curBalls.length===3){
-    G.doneSkewers.push([...G.curBalls]);G.curBalls=[];
-    const rem=G.skewer-G.doneSkewers.length;
-    if(rem>0)toast(`🍡 꼬치 완성! ${rem}개 더!`,'ok');
-    else toast(`🍡 완성! 소스 골라서 서빙해요!`,'ok');
+    G.doneSkewers.push([...G.curBalls]);
+    G.curBalls=[];
+    toast(`🍡 ${G.doneSkewers.length}번째 꼬치 완성! 계속 만들거나 소스 골라서 서빙해요!`,'ok');
   }
   updateCraftDisplay();checkReady();
 }
@@ -821,23 +806,31 @@ function updateCraftDisplay(){
   const statusEl=document.getElementById('craft-status');
   const ballsWrap=document.getElementById('craft-balls-wrap');
   const doneEl=document.getElementById('done-skewers');
-  const done=G.doneSkewers.length,target=G.skewer;
-  if(!target){statusEl.innerHTML='꼬치 개수를 먼저 골라요!';}
-  else if(done>=target){statusEl.innerHTML=`✅ 꼬치 ${target}개 완성! <em>소스 선택 후 서빙!</em>`;}
-  else{statusEl.innerHTML=`🍡 ${done+1}번째 꼬치 — <em>${G.curBalls.length}/3</em>개`;}
+  const done=G.doneSkewers.length;
+
+  // 상태 텍스트
+  if(done===0&&G.curBalls.length===0){
+    statusEl.innerHTML='당고를 골라서 꼬치에 꿰어요!';
+  } else if(G.sauce&&done>0&&G.curBalls.length===0){
+    statusEl.innerHTML=`✅ 꼬치 ${done}개 완성! <em>서빙 가능!</em>`;
+  } else {
+    statusEl.innerHTML=`🍡 ${done+1}번째 꼬치 — <em>${G.curBalls.length}/3</em>개`;
+  }
+
   // 볼 크기 동적 계산
   const bsz=Math.min(36,Math.max(26,window.innerWidth*0.08));
   const stickW=3*bsz+24;
   document.getElementById('craft-stick-bg').style.width=stickW+'px';
 
+  // 현재 꼬치 당고 + 빈 슬롯
   let ballsHTML=G.curBalls.map(b=>`<span class="craft-ball">${b.emoji}</span>`).join('');
-  if(target>0&&done<target){
-    for(let i=0;i<3-G.curBalls.length;i++){
-      ballsHTML+=`<span class="craft-ball-empty"><svg width="${bsz}" height="${bsz}" viewBox="0 0 34 34"><circle cx="17" cy="17" r="14" fill="none" stroke="rgba(200,140,80,.35)" stroke-width="2.5" stroke-dasharray="5 4"/></svg></span>`;
-    }
+  for(let i=0;i<3-G.curBalls.length;i++){
+    ballsHTML+=`<span class="craft-ball-empty"><svg width="${bsz}" height="${bsz}" viewBox="0 0 34 34"><circle cx="17" cy="17" r="14" fill="none" stroke="rgba(200,140,80,.35)" stroke-width="2.5" stroke-dasharray="5 4"/></svg></span>`;
   }
   ballsWrap.innerHTML=ballsHTML;
-  doneEl.innerHTML=G.doneSkewers.map((sk,i)=>`<span class="done-sk">${sk.map(b=>b.emoji).join('')}🍢</span>`).join('');
+
+  // 완성된 꼬치들
+  doneEl.innerHTML=G.doneSkewers.map(sk=>`<span class="done-sk">${sk.map(b=>b.emoji).join('')}🍢</span>`).join('');
 }
 function setSauce(s){
   G.sauce=s;
@@ -845,7 +838,8 @@ function setSauce(s){
   checkReady();
 }
 function checkReady(){
-  const ok=G.skewer>0&&G.doneSkewers.length>=G.skewer&&!!G.sauce;
+  // 완성된 꼬치 1개 이상 + 소스 선택 + 현재 꼬치 비어있어야 서빙 가능
+  const ok=G.doneSkewers.length>=1&&!!G.sauce&&G.curBalls.length===0;
   const btn=document.getElementById('serve-btn');
   btn.className=ok?'on':'';
   btn.style.boxShadow=(ok&&G.buffs.hint&&G.cust&&orderMatch())?'0 3px 0 var(--sage3),0 0 0 3px rgba(100,180,80,.3)':'';
@@ -853,7 +847,9 @@ function checkReady(){
 function orderMatch(){
   if(!G.cust)return false;
   const m=G.cust.menu;
-  if(G.skewer!==m.skewer)return false;
+  // 꼬치 개수 체크
+  if(G.doneSkewers.length!==m.skewer)return false;
+  // 꼬치 구성 체크 (첫 번째 꼬치 기준)
   const ref=G.doneSkewers[0]||[];
   const my={};ref.forEach(b=>{my[b.id]=(my[b.id]||0)+1;});
   const ok=Object.keys(m.dangos);
@@ -862,7 +858,7 @@ function orderMatch(){
   return G.sauce===m.sauce;
 }
 function doServe(){
-  if(!(G.skewer>0&&G.doneSkewers.length>=G.skewer&&G.sauce))return;
+  if(!(G.doneSkewers.length>=1&&G.sauce&&G.curBalls.length===0))return;
   if(!G.cust){toast('손님이 없어요!','ng');return;}
   const matched=orderMatch(),savedMenu=G.cust.menu;
   clearInterval(G.ctimer);G.cust=null;G.total++;
@@ -883,8 +879,8 @@ function doServe(){
   resetCraft();
 }
 function resetCraft(){
-  G.skewer=0;G.curBalls=[];G.doneSkewers=[];G.sauce=null;
-  document.querySelectorAll('[data-sk],[data-s]').forEach(b=>b.classList.remove('sel'));
+  G.curBalls=[];G.doneSkewers=[];G.sauce=null;
+  document.querySelectorAll('[data-s]').forEach(b=>b.classList.remove('sel'));
   updateCraftDisplay();checkReady();
 }
 
