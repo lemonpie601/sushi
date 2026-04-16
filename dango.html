@@ -621,32 +621,35 @@ const SAUCES={
   plain:{label:'없음',emoji:'✖️'},
 };
 const MENUS=[
-  {skewer:1,dangos:{white:3},sauce:'mitarashi',base:1800},
-  {skewer:1,dangos:{pink:3},sauce:'anko',base:2000},
-  {skewer:1,dangos:{green:3},sauce:'matcha',base:2200},
-  {skewer:1,dangos:{sesame:3},sauce:'kinako',base:2000},
-  {skewer:1,dangos:{sakura:3},sauce:'plain',base:2400},
-  {skewer:1,dangos:{strawb:3},sauce:'plain',base:2200},
-  {skewer:1,dangos:{white:1,pink:1,green:1},sauce:'mitarashi',base:2600},
-  {skewer:1,dangos:{pink:1,sesame:1,white:1},sauce:'anko',base:2600},
-  {skewer:2,dangos:{white:3},sauce:'mitarashi',base:3600},
-  {skewer:2,dangos:{green:3},sauce:'matcha',base:3800},
-  {skewer:2,dangos:{white:1,pink:1,green:1},sauce:'kinako',base:4200},
-  {skewer:3,dangos:{white:3},sauce:'mitarashi',base:5200},
-  {skewer:3,dangos:{white:1,green:1,pink:1},sauce:'plain',base:5800},
-  {skewer:2,dangos:{yuzu:1,sakura:1,strawb:1},sauce:'plain',base:4400},
-  {skewer:1,dangos:{mochi:3},sauce:'kinako',base:2400},
-  {skewer:1,dangos:{choco:3},sauce:'choco',base:2600},
-  {skewer:1,dangos:{grape:3},sauce:'plain',base:2400},
-  {skewer:1,dangos:{melon:3},sauce:'plain',base:2400},
-  {skewer:1,dangos:{caramel:3},sauce:'caramel',base:2800},
-  {skewer:2,dangos:{choco:3},sauce:'choco',base:4800},
-  {skewer:2,dangos:{strawb:1,choco:1,pink:1},sauce:'choco',base:5000},
-  {skewer:1,dangos:{white:1,choco:1,sesame:1},sauce:'kinako',base:3000},
-  {skewer:2,dangos:{grape:1,melon:1,sakura:1},sauce:'plain',base:4600},
-  {skewer:3,dangos:{choco:3},sauce:'caramel',base:6400},
-  {skewer:1,dangos:{melon:1,yuzu:1,green:1},sauce:'matcha',base:3200},
-  {skewer:3,dangos:{strawb:1,grape:1,melon:1},sauce:'plain',base:6200},
+  // 꼬치 1개
+  {skewers:[{white:3}],sauce:'mitarashi',base:1800},
+  {skewers:[{pink:3}],sauce:'anko',base:2000},
+  {skewers:[{green:3}],sauce:'matcha',base:2200},
+  {skewers:[{sesame:3}],sauce:'kinako',base:2000},
+  {skewers:[{sakura:3}],sauce:'plain',base:2400},
+  {skewers:[{strawb:3}],sauce:'plain',base:2200},
+  {skewers:[{white:1,pink:1,green:1}],sauce:'mitarashi',base:2600},
+  {skewers:[{pink:1,sesame:1,white:1}],sauce:'anko',base:2600},
+  {skewers:[{mochi:3}],sauce:'kinako',base:2400},
+  {skewers:[{choco:3}],sauce:'choco',base:2600},
+  {skewers:[{grape:3}],sauce:'plain',base:2400},
+  {skewers:[{melon:3}],sauce:'plain',base:2400},
+  {skewers:[{caramel:3}],sauce:'caramel',base:2800},
+  {skewers:[{white:1,choco:1,sesame:1}],sauce:'kinako',base:3000},
+  {skewers:[{melon:1,yuzu:1,green:1}],sauce:'matcha',base:3200},
+  // 꼬치 2개 — 꼬치마다 다른 구성
+  {skewers:[{white:3},{green:3}],sauce:'mitarashi',base:3600},
+  {skewers:[{green:3},{pink:3}],sauce:'matcha',base:3800},
+  {skewers:[{white:1,pink:1,green:1},{sesame:3}],sauce:'kinako',base:4200},
+  {skewers:[{yuzu:1,sakura:1,strawb:1},{mochi:3}],sauce:'plain',base:4400},
+  {skewers:[{choco:3},{caramel:3}],sauce:'choco',base:4800},
+  {skewers:[{strawb:1,choco:1,pink:1},{white:3}],sauce:'choco',base:5000},
+  {skewers:[{grape:1,melon:1,sakura:1},{green:3}],sauce:'plain',base:4600},
+  // 꼬치 3개 — 꼬치마다 다른 구성
+  {skewers:[{white:3},{green:3},{pink:3}],sauce:'mitarashi',base:5200},
+  {skewers:[{white:1,green:1,pink:1},{sesame:3},{mochi:3}],sauce:'plain',base:5800},
+  {skewers:[{choco:3},{caramel:3},{white:3}],sauce:'caramel',base:6400},
+  {skewers:[{strawb:1,grape:1,melon:1},{choco:3},{green:3}],sauce:'plain',base:6200},
 ];
 const SHOP_ITEMS=[
   {id:'tip',icon:'💸',name:'단골 손님',desc:'서빙 성공 시 +300원 팁',price:4000},
@@ -760,7 +763,6 @@ function spawnCust(){
   do { menu=menus[rnd(0,menus.length-1)]; } while(menus.length>1 && menu===G.lastMenu);
   G.lastMenu=menu;
   G.cust={menu,tl:getTL(),maxTl:getTL()};
-  G.cust={menu,tl:getTL(),maxTl:getTL()};
   setCustImg('normal');showBubble('order',menu);setTbar(100,'var(--sage2)');
   if(G.ctimer)clearInterval(G.ctimer);
   G.ctimer=setInterval(()=>{
@@ -805,7 +807,7 @@ function showBubble(type,menu){
     const si=SAUCES[menu.sauce];
     el.innerHTML=`
       <div class="bub-title">주문할게요!</div>
-      <div class="bub-skewers">${Array.from({length:menu.skewer},()=>`<div class="bub-skewer-row">${skSVG(menu.dangos)}</div>`).join('')}</div>
+      <div class="bub-skewers">${menu.skewers.map(dangos=>`<div class="bub-skewer-row">${skSVG(dangos)}</div>`).join('')}</div>
       <div class="bub-sauce-row">${si.emoji} 소스: <b>${si.label}</b></div>`;
   }
 }
@@ -880,14 +882,21 @@ function checkReady(){
 function orderMatch(){
   if(!G.cust)return false;
   const m=G.cust.menu;
-  // 꼬치 개수 체크
-  if(G.doneSkewers.length!==m.skewer)return false;
-  // 꼬치 구성 체크 (첫 번째 꼬치 기준)
-  const ref=G.doneSkewers[0]||[];
-  const my={};ref.forEach(b=>{my[b.id]=(my[b.id]||0)+1;});
-  const ok=Object.keys(m.dangos);
-  if(ok.length!==Object.keys(my).length)return false;
-  for(const k of ok){if((my[k]||0)!==m.dangos[k])return false;}
+  if(G.doneSkewers.length!==m.skewers.length)return false;
+  // 꼬치별 구성 비교 (순서 무관)
+  const usedIdx=new Set();
+  for(const req of m.skewers){
+    let found=false;
+    for(let i=0;i<G.doneSkewers.length;i++){
+      if(usedIdx.has(i))continue;
+      const my={};G.doneSkewers[i].forEach(b=>{my[b.id]=(my[b.id]||0)+1;});
+      const keys=Object.keys(req);
+      if(keys.length===Object.keys(my).length&&keys.every(k=>(my[k]||0)===req[k])){
+        usedIdx.add(i);found=true;break;
+      }
+    }
+    if(!found)return false;
+  }
   return G.sauce===m.sauce;
 }
 function doServe(){
