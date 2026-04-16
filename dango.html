@@ -833,8 +833,6 @@ function addDango(id){
     G.doneSkewers.push([...G.curBalls]);
     G.curBalls=[];
     toast(`🍡 ${G.doneSkewers.length}번째 꼬치 완성!`,'ok');
-    // 소스 탭으로 자동 이동
-    switchTab('sauce');
   }
   updateCraftDisplay();checkReady();
 }
