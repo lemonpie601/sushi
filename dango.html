@@ -33,34 +33,8 @@ body{
   color:var(--text);
   height:100dvh;
   display:flex;flex-direction:column;
+  /* 따뜻한 파스텔 배경 */
   background:linear-gradient(160deg,#fff0e8 0%,#fde8d8 50%,#f8dcc8 100%);
-}
-/* ════ PC 반응형 (600px 이상) ════ */
-@media(min-width:600px){
-  #game-body{
-    flex:1;min-height:0;
-    display:flex;flex-direction:row;
-    overflow:hidden;
-  }
-  /* 왼쪽: 가게뷰 */
-  #store{
-    flex:1;min-width:0;
-  }
-  /* 오른쪽: 제작 패널 */
-  #right-panel{
-    width:min(380px,45vw);
-    flex-shrink:0;
-    display:flex;flex-direction:column;
-    border-left:3px solid var(--wood3);
-  }
-  /* PC에서 bench 높이 고정 해제 */
-  #bench{
-    flex:1;height:auto!important;max-height:none!important;
-  }
-  /* PC에서 craft-display 위치 조정 */
-  #craft-display{
-    order:-1;
-  }
 }
 
 /* ════════════════════════
@@ -69,7 +43,7 @@ body{
 #hdr{
   flex-shrink:0;
   background:linear-gradient(90deg,#7a4528,#5a3018);
-  padding:max(6px,env(safe-area-inset-top)) 12px 5px;
+  padding:6px 12px 5px;
   display:flex;flex-direction:column;gap:3px;
   box-shadow:0 3px 12px rgba(80,30,10,.35);
   position:relative;overflow:hidden;
@@ -118,8 +92,6 @@ body{
 /* ════════════════════════
    가게 뷰 (손님 영역)
 ════════════════════════ */
-#game-body{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;}
-#right-panel{display:flex;flex-direction:column;flex-shrink:0;}
 #store{
   flex:1;min-height:0;
   position:relative;overflow:hidden;
@@ -215,15 +187,15 @@ body{
 
 #cust-wrap{display:flex;flex-direction:column;align-items:center;}
 #cust-img{
-  width:clamp(150px,42vw,220px);
-  height:clamp(190px,52vw,280px);
+  width:clamp(90px,24vw,130px);
+  height:clamp(112px,30vw,160px);
   object-fit:contain;object-position:center bottom;
   display:block;
   filter:drop-shadow(0 4px 10px rgba(0,0,0,.25));
   transition:filter .3s;
 }
-#cust-img.happy{filter:drop-shadow(0 4px 10px rgba(0,0,0,.2)) brightness(1.003) saturate(1.03);}
-#cust-img.angry{filter:drop-shadow(0 4px 10px rgba(0,0,0,.2)) saturate(0.8) hue-rotate(-20deg) brightness(0.996);}
+#cust-img.happy{filter:drop-shadow(0 4px 10px rgba(0,0,0,.2)) brightness(1.1) saturate(1.3);}
+#cust-img.angry{filter:drop-shadow(0 4px 10px rgba(0,0,0,.2)) saturate(1.8) hue-rotate(-20deg) brightness(.88);}
 #cust-tbar-bg{
   width:clamp(90px,24vw,130px);
   height:5px;background:rgba(0,0,0,.12);
@@ -235,7 +207,7 @@ body{
    제작 디스플레이 (꼬치 미리보기)
 ════════════════════════ */
 #craft-display{
-  flex-shrink:0;height:80px;
+  flex-shrink:0;height:88px;
   background:linear-gradient(180deg,#fff8f0,#ffecd8);
   border-top:3px solid var(--peach2);
   border-bottom:2px solid var(--cream3);
@@ -260,10 +232,10 @@ body{
 #craft-status em{color:var(--pink2);font-style:normal;font-size:12px;}
 #craft-skewer-area{
   position:absolute;
-  top:50%;left:0;right:0;
+  top:50%;left:8px;right:8px;
   transform:translateY(-50%);
   display:flex;align-items:center;justify-content:center;
-  height:50px;
+  height:54px;
 }
 #craft-stick-wrap{
   position:relative;
@@ -280,7 +252,7 @@ body{
 #craft-handle{
   width:11px;height:22px;border-radius:3px;
   background:linear-gradient(180deg,#a86030,#784020);
-  margin-left:-1.3px;flex-shrink:0;
+  margin-left:0;flex-shrink:0;
   box-shadow:1px 2px 5px rgba(0,0,0,.3);
 }
 #craft-balls-wrap{
@@ -339,31 +311,34 @@ body{
   );
 }
 
-/* 서빙 버튼 행 */
-#serve-rst-row{display:flex;gap:6px;position:relative;z-index:1;}
+/* 꼬치 옆 서빙+초기화 */
+#craft-actions{
+  display:flex;flex-direction:column;gap:4px;
+  margin-left:8px;flex-shrink:0;
+}
 #serve-btn{
-  flex:1;font-family:'Jua',sans-serif;font-size:14px;
-  padding:9px;height:44px;border:none;border-radius:12px;
-  background:rgba(255,255,255,.1);
+  font-family:'Jua',sans-serif;font-size:12px;
+  padding:5px 10px;height:auto;border:none;border-radius:10px;
+  background:rgba(255,255,255,.15);
   color:rgba(255,236,200,.35);
   cursor:not-allowed;transition:all .2s;
-  letter-spacing:.04em;
-  border:1.5px solid rgba(255,255,255,.08);
+  white-space:nowrap;
+  border:1.5px solid rgba(255,255,255,.1);
 }
 #serve-btn.on{
   background:linear-gradient(135deg,var(--sage2),var(--sage3));
   color:#fff;cursor:pointer;
   border-color:var(--sage2);
-  box-shadow:0 3px 0 var(--sage3),0 4px 14px rgba(60,120,40,.35);
+  box-shadow:0 2px 0 var(--sage3),0 3px 10px rgba(60,120,40,.3);
 }
-#serve-btn.on:active{transform:translateY(2px);box-shadow:0 1px 0 var(--sage3);}
+#serve-btn.on:active{transform:translateY(1px);box-shadow:0 1px 0 var(--sage3);}
 #rst-btn{
-  width:44px;height:44px;border-radius:12px;
+  width:auto;height:auto;
+  padding:4px 10px;border-radius:10px;
   background:rgba(255,255,255,.08);
-  border:1.5px solid rgba(255,255,255,.15);
-  font-size:17px;cursor:pointer;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  color:rgba(255,236,200,.6);
+  border:1.5px solid rgba(255,255,255,.12);
+  font-size:13px;cursor:pointer;
+  color:rgba(255,236,200,.5);
   transition:all .12s;
 }
 #rst-btn:active{background:rgba(255,255,255,.2);}
@@ -540,7 +515,6 @@ input.hidden-file{display:none;}
   </div>
 </div>
 
-<div id="game-body">
 <!-- 가게 뷰 -->
 <div id="store">
   <div id="store-bg"></div>
@@ -557,7 +531,6 @@ input.hidden-file{display:none;}
   </div>
 </div>
 
-<div id="right-panel">
 <!-- 제작 디스플레이 -->
 <div id="craft-display">
   <div id="craft-status">꼬치 개수를 먼저 골라요!</div>
@@ -567,16 +540,17 @@ input.hidden-file{display:none;}
       <div id="craft-handle"></div>
       <div id="craft-balls-wrap"></div>
     </div>
+    <!-- 서빙+초기화 버튼을 꼬치 오른쪽에 -->
+    <div id="craft-actions">
+      <button id="serve-btn" onclick="doServe()">서빙!</button>
+      <button id="rst-btn" onclick="resetCraft()">🗑</button>
+    </div>
   </div>
   <div id="done-skewers"></div>
 </div>
 
 <!-- 제작대 -->
 <div id="bench">
-  <div id="serve-rst-row">
-    <button id="serve-btn" onclick="doServe()">🍱 서빙하기</button>
-    <button id="rst-btn" onclick="resetCraft()">🗑</button>
-  </div>
   <div class="bench-section">
     <div class="bench-lbl">꼬치 개수</div>
     <div class="pick-row" id="skewer-row">
@@ -584,10 +558,6 @@ input.hidden-file{display:none;}
       <div class="skewer-btn" onclick="setSkewer(2)" data-sk="2"><span class="skewer-icon">🍡🍡</span><span class="skewer-name">2개</span></div>
       <div class="skewer-btn" onclick="setSkewer(3)" data-sk="3"><span class="skewer-icon">🍡🍡🍡</span><span class="skewer-name">3개</span></div>
     </div>
-  </div>
-  <div class="bench-section">
-    <div class="bench-lbl">당고 종류</div>
-    <div class="pick-row" id="dango-row"></div>
   </div>
   <div class="bench-section">
     <div class="bench-lbl">소스</div>
@@ -601,9 +571,11 @@ input.hidden-file{display:none;}
       <div class="sauce-btn" onclick="setSauce('plain')" data-s="plain"><span class="sauce-emoji">✖️</span><span class="sauce-name">없음</span></div>
     </div>
   </div>
+  <div class="bench-section">
+    <div class="bench-lbl">당고 종류</div>
+    <div class="pick-row" id="dango-row"></div>
+  </div>
 </div>
-</div><!-- /right-panel (PC에서만 의미있음) -->
-</div><!-- /game-body -->
 
 <div id="overlay"><div class="ov-card" id="ov-card"></div></div>
 <div id="toast"></div>
@@ -612,7 +584,7 @@ input.hidden-file{display:none;}
 // ══════ 데이터 ══════
 const DANGOS=[
   {id:'white',  emoji:'⚪',name:'흰 당고'},
-  {id:'pink',   emoji:'🩷',name:'분홍 당고'},
+  {id:'pink',   emoji:'🟣',name:'분홍 당고'},
   {id:'green',  emoji:'🟢',name:'말차 당고'},
   {id:'sesame', emoji:'⚫',name:'참깨 당고'},
   {id:'sakura', emoji:'🌸',name:'벚꽃 당고'},
@@ -622,7 +594,7 @@ const DANGOS=[
   {id:'choco',  emoji:'🍫',name:'초코 당고'},
   {id:'melon',  emoji:'🟩',name:'멜론 당고'},
   {id:'grape',  emoji:'🍇',name:'포도 당고'},
-  {id:'caramel',emoji:'🟨',name:'카라멜 당고'},
+  {id:'caramel',emoji:'🧇',name:'카라멜 당고'},
 ];
 const SAUCES={
   mitarashi:{label:'미타라시',emoji:'🍯'},
@@ -634,34 +606,32 @@ const SAUCES={
   plain:{label:'없음',emoji:'✖️'},
 };
 const MENUS=[
-  // Lv1 — 쉬운 1꼬치 단순조합
   {skewer:1,dangos:{white:3},sauce:'mitarashi',base:1800},
   {skewer:1,dangos:{pink:3},sauce:'anko',base:2000},
   {skewer:1,dangos:{green:3},sauce:'matcha',base:2200},
+  {skewer:1,dangos:{sesame:3},sauce:'kinako',base:2000},
+  {skewer:1,dangos:{sakura:3},sauce:'plain',base:2400},
+  {skewer:1,dangos:{strawb:3},sauce:'plain',base:2200},
   {skewer:1,dangos:{white:1,pink:1,green:1},sauce:'mitarashi',base:2600},
   {skewer:1,dangos:{pink:1,sesame:1,white:1},sauce:'anko',base:2600},
-  {skewer:1,dangos:{sakura:1,yuzu:1,white:1},sauce:'plain',base:2800},
-  {skewer:1,dangos:{strawb:1,pink:1,sakura:1},sauce:'plain',base:2800},
-  // Lv2 — 섞인 조합 + 소스 다양화
-  {skewer:1,dangos:{green:1,white:1,sesame:1},sauce:'kinako',base:3000},
-  {skewer:1,dangos:{mochi:1,white:1,pink:1},sauce:'kinako',base:3000},
-  {skewer:1,dangos:{choco:1,sesame:1,mochi:1},sauce:'choco',base:3200},
-  {skewer:1,dangos:{melon:1,yuzu:1,green:1},sauce:'matcha',base:3200},
-  {skewer:2,dangos:{white:1,pink:1,green:1},sauce:'mitarashi',base:4200},
-  {skewer:2,dangos:{pink:1,sakura:1,yuzu:1},sauce:'anko',base:4400},
+  {skewer:2,dangos:{white:3},sauce:'mitarashi',base:3600},
+  {skewer:2,dangos:{green:3},sauce:'matcha',base:3800},
+  {skewer:2,dangos:{white:1,pink:1,green:1},sauce:'kinako',base:4200},
+  {skewer:3,dangos:{white:3},sauce:'mitarashi',base:5200},
+  {skewer:3,dangos:{white:1,green:1,pink:1},sauce:'plain',base:5800},
   {skewer:2,dangos:{yuzu:1,sakura:1,strawb:1},sauce:'plain',base:4400},
-  // Lv3 — 2꼬치 복잡조합
-  {skewer:2,dangos:{green:1,sesame:1,mochi:1},sauce:'matcha',base:4600},
+  {skewer:1,dangos:{mochi:3},sauce:'kinako',base:2400},
+  {skewer:1,dangos:{choco:3},sauce:'choco',base:2600},
+  {skewer:1,dangos:{grape:3},sauce:'plain',base:2400},
+  {skewer:1,dangos:{melon:3},sauce:'plain',base:2400},
+  {skewer:1,dangos:{caramel:3},sauce:'caramel',base:2800},
+  {skewer:2,dangos:{choco:3},sauce:'choco',base:4800},
   {skewer:2,dangos:{strawb:1,choco:1,pink:1},sauce:'choco',base:5000},
+  {skewer:1,dangos:{white:1,choco:1,sesame:1},sauce:'kinako',base:3000},
   {skewer:2,dangos:{grape:1,melon:1,sakura:1},sauce:'plain',base:4600},
-  {skewer:2,dangos:{choco:1,caramel:1,mochi:1},sauce:'caramel',base:5200},
-  {skewer:2,dangos:{grape:1,strawb:1,pink:1},sauce:'plain',base:4800},
-  // Lv4 — 3꼬치 어려운조합
-  {skewer:3,dangos:{white:1,green:1,pink:1},sauce:'mitarashi',base:5800},
+  {skewer:3,dangos:{choco:3},sauce:'caramel',base:6400},
+  {skewer:1,dangos:{melon:1,yuzu:1,green:1},sauce:'matcha',base:3200},
   {skewer:3,dangos:{strawb:1,grape:1,melon:1},sauce:'plain',base:6200},
-  {skewer:3,dangos:{choco:1,caramel:1,sesame:1},sauce:'caramel',base:6400},
-  {skewer:3,dangos:{sakura:1,yuzu:1,mochi:1},sauce:'kinako',base:6200},
-  {skewer:3,dangos:{pink:1,choco:1,strawb:1},sauce:'choco',base:6600},
 ];
 const SHOP_ITEMS=[
   {id:'tip',icon:'💸',name:'단골 손님',desc:'서빙 성공 시 +300원 팁',price:4000},
@@ -764,7 +734,7 @@ function getLvMenus(){
   if(G.day<=4)return MENUS.slice(0,11);
   return MENUS;
 }
-function getTL(){return G.buffs.timer?20000:13000;}
+function getTL(){return G.buffs.timer?28000:20000;}
 
 function spawnCust(){
   if(G.sec<=0)return;
