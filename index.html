@@ -1008,22 +1008,22 @@ function toast(msg,cls){
 </script>
 
 <script>
-// ── PWA ──
+// ── Service Worker 등록 (PWA) ──
 if('serviceWorker' in navigator){
   const swCode=`
-    const CACHE='dango-v1776298767';
+    const CACHE='dango-v1';
+    const ASSETS=['/'];
     self.addEventListener('install',e=>{
+      e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)));
       self.skipWaiting();
     });
     self.addEventListener('activate',e=>{
-      // 이전 캐시 전부 삭제 → 항상 최신 버전
       e.waitUntil(caches.keys().then(keys=>Promise.all(keys.map(k=>caches.delete(k)))));
       self.clients.claim();
     });
     self.addEventListener('fetch',e=>{
-      // 네트워크 우선 → 실패 시 캐시
-      e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)));
-    });
+      e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))); 
+   });
   `;
   const blob=new Blob([swCode],{type:'application/javascript'});
   const url=URL.createObjectURL(blob);
@@ -1032,7 +1032,6 @@ if('serviceWorker' in navigator){
   }).catch(e=>console.log('SW 등록 실패(로컬파일에서는 정상):',e));
 }
 
-// ── iOS 홈화면 추가 안내 ──
 window.addEventListener('load',()=>{
   const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
   const isStandalone=window.navigator.standalone;
@@ -1046,7 +1045,7 @@ window.addEventListener('load',()=>{
       el.onclick=()=>el.remove();
       document.body.appendChild(el);
       setTimeout(()=>el&&el.remove(),5000);
-    },2500);
+    },2000);
   }
 });
 </script>
