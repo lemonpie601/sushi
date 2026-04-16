@@ -755,7 +755,11 @@ function spawnCust(){
   if(G.sec<=0)return;
   const list=getActiveCusts();
   if(list.length>1)activeCustIdx=(activeCustIdx+1)%list.length;
-  const menu=getLvMenus()[rnd(0,getLvMenus().length-1)];
+  const menus=getLvMenus();
+  let menu;
+  do { menu=menus[rnd(0,menus.length-1)]; } while(menus.length>1 && menu===G.lastMenu);
+  G.lastMenu=menu;
+  G.cust={menu,tl:getTL(),maxTl:getTL()};
   G.cust={menu,tl:getTL(),maxTl:getTL()};
   setCustImg('normal');showBubble('order',menu);setTbar(100,'var(--sage2)');
   if(G.ctimer)clearInterval(G.ctimer);
