@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>🍡 당고집</title>
 <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+<link rel="manifest" href="/sushi/manifest.json">
+<meta name="theme-color" content="#5a3018">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="당고집">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="/sushi/icon.svg">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 :root{
@@ -1008,33 +1015,54 @@ function toast(msg,cls){
 </script>
 
 <script>
-// ── PWA ──
+// ── PWA Service Worker ──
 if('serviceWorker' in navigator){
-  const swCode=`
-    self.addEventListener('install',e=>{self.skipWaiting();});
-    self.addEventListener('activate',e=>{
-      e.waitUntil(caches.keys().then(keys=>Promise.all(keys.map(k=>caches.delete(k)))));
-      self.clients.claim();
-    });
-    self.addEventListener('fetch',e=>{
-      e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)));
-    });
-  `;
-  const blob=new Blob([swCode],{type:'application/javascript'});
-  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
+  // GitHub Pages에서는 sw.js가 같은 경로에 있어야 함
+  navigator.serviceWorker.register('/sushi/sw.js')
+    .then(reg=>{
+      console.log('🍡 SW 등록 완료:', reg.scope);
+      // 새 버전이 있으면 바로 적용
+      reg.addEventListener('updatefound',()=>{
+        const newSW=reg.installing;
+        newSW.addEventListener('statechange',()=>{
+          if(newSW.state==='installed'&&navigator.serviceWorker.controller){
+            // 새 버전 알림
+            toast('🔄 업데이트! 새로고침하면 최신 버전으로 바뀌어요','gold');
+          }
+        });
+      });
+    })
+    .catch(err=>console.log('SW 등록 실패 (로컬에서는 정상):', err));
 }
+
+// ── 홈화면 추가 안내 ──
 window.addEventListener('load',()=>{
   const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
-  if(isIOS&&!window.navigator.standalone&&!sessionStorage.getItem('pwa')){
-    sessionStorage.setItem('pwa','1');
+  const isAndroid=/android/i.test(navigator.userAgent);
+  const isStandalone=window.navigator.standalone||window.matchMedia('(display-mode: standalone)').matches;
+  if(!isStandalone&&!sessionStorage.getItem('pwa-hint')){
+    sessionStorage.setItem('pwa-hint','1');
     setTimeout(()=>{
       const el=document.createElement('div');
-      el.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#5a3018;color:#ffecd8;padding:10px 16px;border-radius:14px;font-size:12px;font-family:Jua,sans-serif;z-index:9999;text-align:center;box-shadow:0 4px 16px rgba(0,0,0,.3);max-width:260px;line-height:1.7;';
-      el.innerHTML='📲 홈 화면에 추가하면 앱처럼 사용 가능!<br><span style="font-size:10px;opacity:.7;">공유버튼 → 홈 화면에 추가</span>';
+      el.style.cssText=[
+        'position:fixed;bottom:24px;left:50%;transform:translateX(-50%)',
+        'background:#5a3018;color:#ffecd8',
+        'padding:11px 18px;border-radius:16px',
+        'font-size:12px;font-family:Jua,sans-serif',
+        'z-index:9999;text-align:center',
+        'box-shadow:0 4px 20px rgba(0,0,0,.35)',
+        'max-width:270px;line-height:1.8',
+        'cursor:pointer;',
+      ].join(';');
+      if(isIOS){
+        el.innerHTML='📲 앱으로 설치하려면<br>공유 → <b>홈 화면에 추가</b><br><span style="font-size:10px;opacity:.6;">탭해서 닫기</span>';
+      } else {
+        el.innerHTML='📲 앱으로 설치하려면<br>메뉴 → <b>앱 설치</b> 또는<br><b>홈 화면에 추가</b><br><span style="font-size:10px;opacity:.6;">탭해서 닫기</span>';
+      }
       el.onclick=()=>el.remove();
       document.body.appendChild(el);
-      setTimeout(()=>el&&el.remove(),5000);
-    },2500);
+      setTimeout(()=>el&&el.remove(),7000);
+    },2000);
   }
 });
 </script>
