@@ -389,7 +389,7 @@ body.theme-forest #sign{background:#2a4018;border-color:#8ac060;color:#e0f8c8;}
   padding:8px 10px;
   display:flex;flex-direction:column;gap:6px;
   overflow:hidden;
-  height:30vh;max-height:50vh;min-height:180px;
+  height:30vh;max-height:30vh;min-height:180px;
   padding-bottom:max(8px,env(safe-area-inset-bottom));
   position:relative;
 }
@@ -574,6 +574,10 @@ body.theme-forest #sign{background:#2a4018;border-color:#8ac060;color:#e0f8c8;}
 .si-btn.have{background:#d1fae5;color:var(--sage3);cursor:default;}
 .si-btn.equip{background:linear-gradient(135deg,var(--peach2),var(--peach3));color:#fff;}
 .si-btn.equipped{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;cursor:default;}
+.si-btn[disabled]{opacity:.8;cursor:default;}
+.si-lv{display:inline-block;margin-left:3px;font-size:9px;font-weight:700;color:var(--sage3);background:#e8f5eb;padding:1px 5px;border-radius:6px;}
+.si-cur{font-size:9px;color:var(--sage3);font-weight:700;margin-bottom:6px;line-height:1.4;}
+.si-next{color:var(--peach3);font-weight:700;}
 
 /* 퀘스트 */
 .quest-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
@@ -756,8 +760,9 @@ input.hidden-file{display:none;}
    데이터 정의
 ════════════════════════════════════════ */
 
-// 당고 (일부는 해금 필요)
+// 당고 (일부는 해금 필요) — 재료 대폭 확장
 const DANGOS=[
+  // 기본
   {id:'white',  emoji:'⚪',name:'흰 당고',   unlocked:true},
   {id:'pink',   emoji:'🩷',name:'분홍 당고', unlocked:true},
   {id:'green',  emoji:'🟢',name:'말차 당고', unlocked:true},
@@ -766,12 +771,25 @@ const DANGOS=[
   {id:'strawb', emoji:'🔴',name:'딸기 당고', unlocked:true},
   {id:'yuzu',   emoji:'🟡',name:'유자 당고', unlocked:true},
   {id:'mochi',  emoji:'🟤',name:'모치 당고', unlocked:true},
+  // 고급
   {id:'choco',  emoji:'🍫',name:'초코 당고', unlocked:false, price:5000, tier:'고급'},
   {id:'melon',  emoji:'🟩',name:'멜론 당고', unlocked:false, price:5000, tier:'고급'},
   {id:'grape',  emoji:'🍇',name:'포도 당고', unlocked:false, price:6000, tier:'고급'},
   {id:'caramel',emoji:'🧇',name:'카라멜 당고',unlocked:false,price:7000, tier:'고급'},
-  {id:'gold',   emoji:'🟨',name:'황금 당고', unlocked:false, price:15000,tier:'레어'},
   {id:'berry',  emoji:'🟣',name:'블루베리',  unlocked:false, price:8000, tier:'고급'},
+  {id:'peach',  emoji:'🍑',name:'복숭아 당고',unlocked:false,price:7500, tier:'고급'},
+  {id:'lemon',  emoji:'🍋',name:'레몬 당고', unlocked:false, price:6500, tier:'고급'},
+  {id:'mint',   emoji:'🟦',name:'민트 당고', unlocked:false, price:7000, tier:'고급'},
+  {id:'coffee', emoji:'☕',name:'커피 당고', unlocked:false, price:8500, tier:'고급'},
+  {id:'cherry', emoji:'🍒',name:'체리 당고', unlocked:false, price:8000, tier:'고급'},
+  // 레어
+  {id:'gold',   emoji:'🟨',name:'황금 당고', unlocked:false, price:15000,tier:'레어'},
+  {id:'rainbow',emoji:'🌈',name:'무지개 당고',unlocked:false,price:20000,tier:'레어'},
+  {id:'star',   emoji:'⭐',name:'별빛 당고', unlocked:false, price:18000,tier:'레어'},
+  {id:'ice',    emoji:'🧊',name:'얼음 당고', unlocked:false, price:12000,tier:'레어'},
+  // 전설
+  {id:'dragon', emoji:'🐉',name:'드래곤 당고',unlocked:false,price:35000,tier:'전설'},
+  {id:'moon',   emoji:'🌕',name:'보름달 당고',unlocked:false,price:28000,tier:'전설'},
 ];
 
 const SAUCES_DEF=[
@@ -783,6 +801,10 @@ const SAUCES_DEF=[
   {id:'choco',    label:'초코소스', emoji:'🍫',unlocked:false,price:4000},
   {id:'caramel',  label:'캐러멜',   emoji:'🧇',unlocked:false,price:4500},
   {id:'honey',    label:'꿀',       emoji:'🟧',unlocked:false,price:6000},
+  {id:'strawb',   label:'딸기잼',   emoji:'🍓',unlocked:false,price:5500},
+  {id:'cream',    label:'크림',     emoji:'🥛',unlocked:false,price:5000},
+  {id:'cinnamon', label:'시나몬',   emoji:'🟫',unlocked:false,price:6500},
+  {id:'sakura',   label:'벚꽃시럽', emoji:'🌸',unlocked:false,price:7500},
 ];
 const SAUCES={};SAUCES_DEF.forEach(s=>SAUCES[s.id]=s);
 
@@ -820,19 +842,53 @@ const BASE_MENUS=[
   {skewers:[{strawb:1,grape:1,melon:1},{choco:3},{green:3}],sauce:'plain',base:6200, diff:5, needs:['grape','melon','choco']},
   {skewers:[{gold:3},{white:3},{pink:3}],sauce:'honey',base:9000, diff:5, needs:['gold','honey']},
   {skewers:[{gold:1,white:1,pink:1},{caramel:3},{berry:3}],sauce:'caramel',base:10000, diff:5, needs:['gold','caramel','berry']},
+  // 새 재료 활용 레시피
+  {skewers:[{peach:3}],sauce:'cream',base:2800, diff:2, needs:['peach','cream']},
+  {skewers:[{lemon:3}],sauce:'honey',base:2600, diff:2, needs:['lemon','honey']},
+  {skewers:[{mint:3}],sauce:'matcha',base:2800, diff:2, needs:['mint']},
+  {skewers:[{coffee:3}],sauce:'cream',base:3000, diff:2, needs:['coffee','cream']},
+  {skewers:[{cherry:3}],sauce:'strawb',base:2800, diff:2, needs:['cherry','strawb']},
+  {skewers:[{white:1,peach:1,cream:1}],sauce:'cream',base:3200, diff:3, needs:['peach','cream']},
+  {skewers:[{lemon:1,yuzu:1,mint:1}],sauce:'honey',base:3400, diff:3, needs:['lemon','mint','honey']},
+  {skewers:[{coffee:1,caramel:1,sesame:1}],sauce:'caramel',base:3600, diff:3, needs:['coffee','caramel']},
+  {skewers:[{cherry:1,strawb:1,pink:1}],sauce:'strawb',base:3400, diff:3, needs:['cherry','strawb']},
+  {skewers:[{peach:3},{cherry:3}],sauce:'cream',base:4600, diff:3, needs:['peach','cherry','cream']},
+  {skewers:[{mint:3},{lemon:3}],sauce:'honey',base:4400, diff:3, needs:['mint','lemon','honey']},
+  {skewers:[{coffee:3},{caramel:3},{white:3}],sauce:'cinnamon',base:6800, diff:5, needs:['coffee','caramel','cinnamon']},
+  {skewers:[{ice:3}],sauce:'mint' in SAUCES?'plain':'plain',base:3200, diff:3, needs:['ice']},
+  {skewers:[{ice:1,mint:1,lemon:1}],sauce:'plain',base:3800, diff:3, needs:['ice','mint','lemon']},
+  {skewers:[{rainbow:3}],sauce:'sakura',base:12000, diff:5, needs:['rainbow','sakura']},
+  {skewers:[{star:3}],sauce:'honey',base:10000, diff:5, needs:['star','honey']},
+  {skewers:[{rainbow:1,star:1,gold:1}],sauce:'honey',base:16000, diff:5, needs:['rainbow','star','gold','honey']},
+  {skewers:[{dragon:3}],sauce:'cinnamon',base:25000, diff:5, needs:['dragon','cinnamon']},
+  {skewers:[{moon:3},{star:3}],sauce:'sakura',base:22000, diff:5, needs:['moon','star','sakura']},
+  {skewers:[{dragon:1,moon:1,rainbow:1},{star:3},{gold:3}],sauce:'honey',base:40000, diff:5, needs:['dragon','moon','rainbow','star','gold','honey']},
+  {skewers:[{sakura:1,cherry:1,peach:1},{mochi:3}],sauce:'sakura',base:4800, diff:3, needs:['cherry','peach','sakura']},
+  {skewers:[{yuzu:3},{lemon:3}],sauce:'honey',base:4600, diff:3, needs:['lemon','honey']},
 ];
 
-// 업그레이드 아이템
+// 업그레이드 아이템 — 레벨 시스템 (maxLv, 레벨당 효과 증가)
+// price(lv) = basePrice * (priceMult)^lv, value(lv) = baseValue * lv
 const SHOP_BUFFS=[
-  {id:'tip',    icon:'💸',name:'단골 손님',  desc:'서빙 성공 시 +300원 팁',    price:4000},
-  {id:'timer',  icon:'⏰',name:'느긋한 손님',desc:'손님 인내심 +8초',          price:7000},
-  {id:'combo',  icon:'🔥',name:'콤보 보너스',desc:'3콤보마다 +1,500원',        price:10000},
-  {id:'hint',   icon:'💡',name:'주문 강조',  desc:'일치 시 서빙 버튼 강조',    price:6000},
-  {id:'timer2', icon:'⏳',name:'여유로운 날',desc:'하루 시간 +20초',           price:9000},
-  {id:'price',  icon:'💎',name:'프리미엄 가게',desc:'모든 판매가 +15%',         price:18000},
-  {id:'combo2', icon:'🌟',name:'황금 콤보',  desc:'5콤보마다 +5,000원',        price:20000},
-  {id:'fast',   icon:'⚡',name:'숙련된 손놀림',desc:'서빙 후 손님 대기 시간 감소',price:8000},
+  {id:'tip',    icon:'💸',name:'단골 손님',    desc:'서빙 성공 시 팁',        maxLv:10, basePrice:4000, priceMult:1.45, baseValue:200, unit:'원', valueLabel:lv=>`+${(200*lv).toLocaleString()}원/서빙`},
+  {id:'timer',  icon:'⏰',name:'느긋한 손님',  desc:'손님 인내심 연장',       maxLv:8,  basePrice:5000, priceMult:1.5,  baseValue:2,   unit:'초', valueLabel:lv=>`+${2*lv}초`},
+  {id:'combo',  icon:'🔥',name:'콤보 보너스',  desc:'3콤보마다 보너스',        maxLv:8,  basePrice:7000, priceMult:1.5,  baseValue:600, unit:'원', valueLabel:lv=>`+${(600*lv).toLocaleString()}원/3콤보`},
+  {id:'hint',   icon:'💡',name:'주문 강조',    desc:'일치 시 서빙버튼 강조',  maxLv:1,  basePrice:6000, priceMult:1,    baseValue:1,   unit:'', valueLabel:lv=>'활성'},
+  {id:'timer2', icon:'⏳',name:'여유로운 날',  desc:'하루 영업 시간 증가',     maxLv:10, basePrice:6000, priceMult:1.4,  baseValue:8,   unit:'초', valueLabel:lv=>`+${8*lv}초/일`},
+  {id:'price',  icon:'💎',name:'프리미엄',    desc:'모든 판매가 증가',        maxLv:10, basePrice:9000, priceMult:1.5,  baseValue:4,   unit:'%', valueLabel:lv=>`+${4*lv}%`},
+  {id:'combo2', icon:'🌟',name:'황금 콤보',    desc:'5콤보마다 대박 보너스',   maxLv:6,  basePrice:12000,priceMult:1.6,  baseValue:1500,unit:'원', valueLabel:lv=>`+${(1500*lv).toLocaleString()}원/5콤보`},
+  {id:'fast',   icon:'⚡',name:'숙련된 손놀림',desc:'손님 대기 시간 감소',     maxLv:5,  basePrice:5000, priceMult:1.5,  baseValue:150, unit:'ms',valueLabel:lv=>`-${150*lv}ms`},
+  {id:'loyal',  icon:'💕',name:'호감도 특화',  desc:'호감 증가 속도 UP',       maxLv:5,  basePrice:6000, priceMult:1.55, baseValue:1,   unit:'', valueLabel:lv=>`+${lv} 호감/서빙`},
+  {id:'vip',    icon:'👑',name:'VIP 손님',    desc:'VIP 손님이 팁 추가',      maxLv:5,  basePrice:10000,priceMult:1.6,  baseValue:10,  unit:'%', valueLabel:lv=>`VIP 등장 +${10*lv}%`},
+  {id:'noanger',icon:'😌',name:'평화의 기운',  desc:'화난 손님 페널티 감소',   maxLv:5,  basePrice:7000, priceMult:1.5,  baseValue:20,  unit:'%', valueLabel:lv=>`-${20*lv}% 호감감소`},
+  {id:'bigsale',icon:'🎯',name:'대형 주문 특화',desc:'난이도 4+ 추가 보너스',  maxLv:8,  basePrice:8000, priceMult:1.5,  baseValue:5,   unit:'%', valueLabel:lv=>`+${5*lv}%`},
 ];
+// 현재 레벨의 가격
+function buffPrice(it,lv){return Math.floor(it.basePrice * Math.pow(it.priceMult, lv));}
+// 특정 buff의 현재 레벨
+function buffLv(id){const v=G.buffs[id];return typeof v==='number'?v:(v?1:0);}
+// 효과값 계산 helper
+function buffValue(id, perLv){return buffLv(id)*perLv;}
 
 // 가게 꾸미기 (장식)
 const SHOP_DECOS=[
@@ -975,7 +1031,34 @@ const G={
   dailyQuests:[],   // 오늘의 랜덤 일일 퀘스트 3개의 id
   lastQuestDay:0,   // 마지막으로 일일 퀘스트 갱신한 day
   isEndDay:false,   // 영업 종료 상태 (오버레이 간 이동 시 복귀용)
+  affinity:{},      // 손님별 호감도 (custId -> number)
 };
+// 호감도 관리
+function getAffinity(id){return (G.affinity&&G.affinity[id])||0;}
+function changeAffinity(id, delta){
+  if(!id)return 0;
+  if(!G.affinity)G.affinity={};
+  // noanger 버프: 감소량 완화
+  if(delta<0 && buffLv('noanger')>0){
+    delta = Math.ceil(delta * (1 - 0.2*buffLv('noanger')));
+  }
+  const prev=G.affinity[id]||0;
+  const next=Math.max(0, Math.min(999, prev+delta));
+  G.affinity[id]=next;
+  // 레벨업 토스트
+  const lv=affLevel(next), pl=affLevel(prev);
+  if(lv>pl && delta>0)toast(`💖 ${custName(id)} 호감도 LV.${lv}!`,'gold');
+  return next;
+}
+function affLevel(v){
+  if(v>=100)return 4; // 단골 VIP
+  if(v>=50)return 3;  // 친한 사이
+  if(v>=20)return 2;  // 아는 사이
+  if(v>=5)return 1;   // 낯익은
+  return 0;
+}
+function affLabel(lv){return ['처음','낯익음','아는 사이','친한 사이','단골 VIP'][lv]||'처음';}
+function custName(id){const c=CUSTS.find(x=>x.id===id);return c?c.name:'손님';}
 const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 
 /* ══════════════════════════════════════
@@ -991,6 +1074,7 @@ function saveGame(){
       unlockedDangos:G.unlockedDangos, unlockedSauces:G.unlockedSauces,
       questProgress:G.questProgress, questClaimed:G.questClaimed,
       dailyQuests:G.dailyQuests, lastQuestDay:G.lastQuestDay,
+      affinity:G.affinity,
       custs: CUSTS.map(c=>({id:c.id,name:c.name,active:c.active})),
     };
     localStorage.setItem(SAVE_KEY,JSON.stringify(data));
@@ -1077,7 +1161,7 @@ window.onload=()=>{
 ════════════════════════════════════════ */
 function startDay(){
   const base=Math.max(40,63-G.day*3);
-  G.sec=base + (G.buffs.timer2?20:0);
+  G.sec=base + buffValue('timer2',8);
   G.dayMoney=0;G.dayHappy=0;G.dayAngry=0;G.dayServed=0;G.dayCorrect=0;G.dayBigOrder=0;
   G.combo=0;
   document.getElementById('h-day').textContent='Day'+G.day;
@@ -1164,7 +1248,14 @@ function pickWeightedMenu(){
   return menu;
 }
 
-function getTL(){return G.buffs.timer?28000:20000;}
+// 손님 인내심 — 기본 빠르게, Day 올라갈수록 더 빠르게
+function getTL(){
+  // 기본 18초 시작 → Day마다 1초씩 감소 → 최소 6초
+  const base=Math.max(6000, 18000 - (G.day-1)*1000);
+  // timer 업그레이드(레벨당 +2초)
+  const bonus=buffValue('timer',2)*1000;
+  return base + bonus;
+}
 
 function spawnCust(){
   if(G.sec<=0)return;
@@ -1190,7 +1281,7 @@ function loseC(){
   G.cust=null;G.angry++;G.dayAngry++;G.combo=0;
   setCustImg('angry');showBubble('angry');updateHUD();
   toast('😤 손님이 화내며 가셨어요!','ng');
-  const wait=G.buffs.fast?1000:1800;
+  const wait=Math.max(500,1800-buffValue('fast',150));
   setTimeout(()=>{showBubble('hidden');setCustImg('empty');setTbar(100,'var(--sage2)');if(G.sec>0)setTimeout(spawnCust,wait);},1800);
 }
 function setTbar(pct,color){
@@ -1321,7 +1412,7 @@ function checkReady(){
   const ok=G.doneSkewers.length>=1&&!!G.sauce&&G.curBalls.length===0;
   const btn=document.getElementById('serve-btn');
   btn.className=ok?'on':'';
-  btn.style.boxShadow=(ok&&G.buffs.hint&&G.cust&&orderMatch())?'0 3px 0 var(--sage3),0 0 0 3px rgba(100,180,80,.3)':'';
+  btn.style.boxShadow=(ok&&buffLv('hint')&&G.cust&&orderMatch())?'0 3px 0 var(--sage3),0 0 0 3px rgba(100,180,80,.3)':'';
 }
 function orderMatch(){
   if(!G.cust)return false;
@@ -1346,6 +1437,7 @@ function doServe(){
   if(!(G.doneSkewers.length>=1&&G.sauce&&G.curBalls.length===0))return;
   if(!G.cust){toast('손님이 없어요!','ng');return;}
   const matched=orderMatch(),savedMenu=G.cust.menu;
+  const servedCustId=G.cust.custId;
   clearInterval(G.ctimer);G.cust=null;G.total++;G.dayServed++;
   updateProgress('served', G.dayServed, true);
   if(matched){
@@ -1353,10 +1445,27 @@ function doServe(){
     if(G.combo>G.bestCombo)G.bestCombo=G.combo;
     let price=savedMenu.base;
     if(savedMenu.diff>=4)price+=Math.floor(price*0.1); // 어려운 메뉴 추가 보너스
-    if(G.buffs.tip)price+=300;
-    if(G.buffs.combo&&G.combo%3===0){price+=1500;toast(`🔥 ${G.combo}콤보! +1,500원!`,'gold');}
-    if(G.buffs.combo2&&G.combo%5===0){price+=5000;toast(`🌟 ${G.combo}콤보! +5,000원!`,'gold');}
-    if(G.buffs.price)price=Math.floor(price*1.15);
+    if(buffLv('tip')>0)price+=buffValue('tip',200);
+    if(buffLv('combo')>0&&G.combo%3===0){const b=buffValue('combo',600);price+=b;toast(`🔥 ${G.combo}콤보! +${b.toLocaleString()}원!`,'gold');}
+    if(buffLv('combo2')>0&&G.combo%5===0){const b=buffValue('combo2',1500);price+=b;toast(`🌟 ${G.combo}콤보! +${b.toLocaleString()}원!`,'gold');}
+    if(buffLv('price')>0)price=Math.floor(price*(1+buffValue('price',0.04)));
+    if(buffLv('bigsale')>0 && savedMenu.diff>=4)price+=buffValue('bigsale',800);
+    // 호감도 보너스: 친한 손님일수록 팁 ↑
+    if(servedCustId){
+      const aff=getAffinity(servedCustId);
+      let affMult=0;
+      if(aff>=20)affMult+=0.05;
+      if(aff>=50)affMult+=0.05;
+      if(aff>=100)affMult+=0.10;
+      if(affMult>0){
+        const affBonus=Math.floor(price*affMult);
+        price+=affBonus;
+        if(aff>=100)toast(`💖 단골 VIP! +${affBonus.toLocaleString()}원`,'gold');
+      }
+      // 호감도 상승
+      const gain=1 + buffValue('loyal',1);
+      changeAffinity(servedCustId, gain);
+    }
     G.money+=price;G.dayMoney+=price;G.happy++;G.dayHappy++;
     // 꼬치 3개짜리 대형 주문
     if(savedMenu.skewers.length>=3)G.dayBigOrder++;
@@ -1372,10 +1481,23 @@ function doServe(){
     updateProgress('happy', G.happy);
     if(savedMenu.skewers.length>=3)updateProgress('bigOrder', G.dayBigOrder, true);
   }else{
-    G.combo=0;G.dayAngry++;G.angry++;setCustImg('angry');showBubble('angry');
-    toast('⚠️ 주문이랑 달라요!','ng');updateHUD();
+    G.combo=0;
+    // 평화의 기운 버프: 화내는 확률 감소(절반 수준으로)
+    const reduce = buffLv('noanger')>0 && Math.random() < 0.3 + 0.1*buffLv('noanger');
+    if(!reduce){
+      G.dayAngry++;G.angry++;setCustImg('angry');showBubble('angry');
+      toast('⚠️ 주문이랑 달라요!','ng');
+    }else{
+      setCustImg('sad');showBubble('sad');
+      toast('😔 손님이 아쉬워해요…','ng');
+    }
+    updateHUD();
+    if(servedCustId){
+      // 실패 시 호감도 감소
+      changeAffinity(servedCustId, -2);
+    }
   }
-  const wait=G.buffs.fast?1000:1500;
+  const wait=Math.max(500,1500-buffValue('fast',150));
   setTimeout(()=>{showBubble('hidden');setCustImg('empty');setTbar(100,'var(--sage2)');if(G.sec>0)setTimeout(spawnCust,wait);},1800);
   resetCraft();
   saveGame();
@@ -1454,12 +1576,20 @@ function renderShop(){
   let bodyHTML='';
   if(_shopTab==='buffs'){
     bodyHTML=`<div class="shop-grid">${SHOP_BUFFS.map(it=>{
-      const owned=G.buffs[it.id],can=!owned&&G.money>=it.price;
-      return `<div class="shop-item${owned?' owned':''}">
-        <div class="si-icon">${it.icon}</div><div class="si-name">${it.name}</div>
+      const lv=buffLv(it.id);
+      const max=it.maxLv||1;
+      const isMax=lv>=max;
+      const nextPrice=isMax?0:buffPrice(it,lv);
+      const can=!isMax && G.money>=nextPrice;
+      const curLabel = it.valueLabel ? it.valueLabel(lv) : (lv>0?'✓ 활성':'비활성');
+      const nextLabel = !isMax && it.valueLabel ? '→ '+it.valueLabel(lv+1) : '';
+      return `<div class="shop-item${lv>0?' owned':''}">
+        <div class="si-icon">${it.icon}</div>
+        <div class="si-name">${it.name} ${max>1?`<span class="si-lv">Lv ${lv}/${max}</span>`:(lv>0?'<span class="si-lv">✓</span>':'')}</div>
         <div class="si-desc">${it.desc}</div>
-        <button class="si-btn ${owned?'have':can?'buy':'cant'}" onclick="buyBuff('${it.id}')">
-          ${owned?'✓ 보유':can?'💰 '+it.price.toLocaleString()+'원':'💸 '+it.price.toLocaleString()+'원'}
+        <div class="si-cur">${curLabel}${nextLabel?`<span class="si-next"> ${nextLabel}</span>`:''}</div>
+        <button class="si-btn ${isMax?'have':can?'buy':'cant'}" onclick="buyBuff('${it.id}')" ${isMax?'disabled':''}>
+          ${isMax?'✓ 최대':can?'💰 '+nextPrice.toLocaleString()+'원':'💸 '+nextPrice.toLocaleString()+'원'}
         </button></div>`;
     }).join('')}</div>`;
   } else if(_shopTab==='ingred'){
@@ -1520,8 +1650,17 @@ function renderShop(){
 function switchShop(t){_shopTab=t;renderShop();}
 function buyBuff(id){
   const it=SHOP_BUFFS.find(x=>x.id===id);
-  if(!it||G.buffs[id]||G.money<it.price)return;
-  G.money-=it.price;G.buffs[id]=true;updateHUD();renderShop();toast(`${it.icon} "${it.name}" 구매!`,'ok');
+  if(!it)return;
+  const lv=buffLv(id);
+  const max=it.maxLv||1;
+  if(lv>=max)return;
+  const price=buffPrice(it,lv);
+  if(G.money<price)return;
+  G.money-=price;
+  G.buffs[id]=lv+1;
+  updateHUD();renderShop();
+  if(lv+1>=max)toast(`${it.icon} "${it.name}" 최대 레벨!`,'gold');
+  else toast(`${it.icon} "${it.name}" Lv.${lv+1} 업!`,'ok');
   saveGame();
 }
 function buyIngred(type,id){
