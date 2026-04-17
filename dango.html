@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>당고집</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍡</text></svg>">
+<title>🍡 당고집</title>
 <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
 <link rel="manifest" href="/sushi/manifest.json">
 <meta name="theme-color" content="#5a3018">
@@ -238,7 +237,42 @@ body.theme-forest #sign{background:#2a4018;border-color:#8ac060;color:#e0f8c8;}
 }
 #cust-img.happy{filter:drop-shadow(0 4px 10px rgba(0,0,0,.2)) brightness(1.004) saturate(1.003);}
 #cust-img.angry{filter:drop-shadow(0 4px 10px rgba(0,0,0,.2)) saturate(1.008) hue-rotate(-20deg) brightness(.98);}
+#cust-img.sad{filter:drop-shadow(0 4px 10px rgba(0,0,0,.2)) saturate(.85) brightness(.95);}
+#cust-img.excited{filter:drop-shadow(0 4px 14px rgba(240,140,180,.4)) brightness(1.02) saturate(1.1);animation:excite .6s ease-in-out infinite alternate;}
+#cust-img.smile{filter:drop-shadow(0 4px 10px rgba(0,0,0,.2)) brightness(1.01);}
+#cust-img.surprise{filter:drop-shadow(0 4px 10px rgba(0,0,0,.2)) brightness(1.05);animation:shake .3s ease-in-out 3;}
+#cust-img.shy{filter:drop-shadow(0 4px 10px rgba(0,0,0,.2)) hue-rotate(10deg);}
+#cust-img.tired{filter:drop-shadow(0 4px 10px rgba(0,0,0,.2)) saturate(.7) brightness(.92);}
+#cust-img.love{filter:drop-shadow(0 4px 14px rgba(240,90,140,.5)) brightness(1.03) saturate(1.08);animation:lovepulse 1s ease-in-out infinite;}
 #cust-img.empty{opacity:0;pointer-events:none;}
+@keyframes excite{from{transform:translateY(0);}to{transform:translateY(-3px);}}
+@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-4px);}75%{transform:translateX(4px);}}
+@keyframes lovepulse{0%,100%{transform:scale(1);}50%{transform:scale(1.02);}}
+/* 호감도 뱃지 & VIP */
+#aff-badge{
+  position:absolute;top:12px;right:12px;z-index:6;
+  display:flex;align-items:center;gap:5px;
+  background:rgba(255,255,255,.94);
+  border:2px solid var(--pink2);
+  border-radius:16px;
+  padding:4px 10px;
+  font-family:'Jua',sans-serif;font-size:11px;color:var(--text);
+  box-shadow:0 2px 8px rgba(0,0,0,.15);
+  transition:all .3s;
+}
+#aff-badge.hidden{opacity:0;pointer-events:none;transform:translateY(-6px);}
+#aff-badge .aff-hearts{color:#e06080;letter-spacing:-1px;}
+#aff-badge .aff-lv{font-size:9px;font-weight:700;color:var(--pink3);}
+#aff-badge.vip{border-color:var(--gold);background:linear-gradient(135deg,#fff7d8,#ffe8a0);animation:vipglow 1.2s ease-in-out infinite alternate;}
+@keyframes vipglow{from{box-shadow:0 2px 8px rgba(0,0,0,.15);}to{box-shadow:0 2px 16px rgba(255,180,40,.6);}}
+.aff-bar{
+  width:60px;height:4px;background:rgba(0,0,0,.12);
+  border-radius:2px;overflow:hidden;
+}
+.aff-bar>div{
+  height:100%;background:linear-gradient(90deg,#f09aac,#e06080);
+  transition:width .4s;
+}
 #cust-tbar-bg{
   width:clamp(100px,28vw,150px);
   height:5px;background:rgba(0,0,0,.12);
@@ -704,6 +738,7 @@ input.hidden-file{display:none;}
   <span class="deco" style="left:6px;bottom:54%;">🪴</span>
   <span class="deco" style="right:6px;bottom:54%;">🌸</span>
   <div id="shop-decos"></div>
+  <div id="aff-badge" class="hidden"></div>
   <div id="customer-area">
     <div id="speech-bubble" class="hidden"></div>
     <div id="cust-wrap">
@@ -1092,6 +1127,7 @@ function loadGame(){
       unlockedDangos:d.unlockedDangos||{}, unlockedSauces:d.unlockedSauces||{},
       questProgress:d.questProgress||{}, questClaimed:d.questClaimed||{},
       dailyQuests:d.dailyQuests||[], lastQuestDay:d.lastQuestDay||0,
+      affinity:d.affinity||{},
     });
     if(d.custs&&d.custs.length){
       const saved=d.custs;
@@ -1265,8 +1301,19 @@ function spawnCust(){
   const baseTL=getTL();
   // 난이도 높으면 시간 살짝 더
   const tl=baseTL + (menu.diff>=3?(menu.diff-2)*2000:0);
-  G.cust={menu,tl,maxTl:tl};
-  setCustImg('normal');showBubble('order',menu);setTbar(100,'var(--sage2)');
+  const curCust=list[activeCustIdx%list.length];
+  const custId=curCust?curCust.id:null;
+  // VIP 확률: buff 레벨당 10%
+  const vipChance=buffValue('vip',0.10);
+  const isVip = vipChance>0 && Math.random()<vipChance;
+  G.cust={menu,tl,maxTl:tl,custId,isVip};
+  // 호감도 높은 손님은 설렘/기쁨 표정으로 등장
+  const aff=getAffinity(custId);
+  let startExp='normal';
+  if(aff>=50) startExp='excited';
+  else if(aff>=20) startExp='smile';
+  setCustImg(startExp);showBubble('order',menu);setTbar(100,'var(--sage2)');
+  renderAffinityBadge(custId, isVip);
   if(G.ctimer)clearInterval(G.ctimer);
   G.ctimer=setInterval(()=>{
     if(!G.cust)return;
@@ -1278,9 +1325,11 @@ function spawnCust(){
   },200);
 }
 function loseC(){
+  const lostCustId=G.cust?G.cust.custId:null;
   G.cust=null;G.angry++;G.dayAngry++;G.combo=0;
   setCustImg('angry');showBubble('angry');updateHUD();
   toast('😤 손님이 화내며 가셨어요!','ng');
+  if(lostCustId)changeAffinity(lostCustId, -3);
   const wait=Math.max(500,1800-buffValue('fast',150));
   setTimeout(()=>{showBubble('hidden');setCustImg('empty');setTbar(100,'var(--sage2)');if(G.sec>0)setTimeout(spawnCust,wait);},1800);
 }
@@ -1438,6 +1487,7 @@ function doServe(){
   if(!G.cust){toast('손님이 없어요!','ng');return;}
   const matched=orderMatch(),savedMenu=G.cust.menu;
   const servedCustId=G.cust.custId;
+  const wasVip=G.cust.isVip;
   clearInterval(G.ctimer);G.cust=null;G.total++;G.dayServed++;
   updateProgress('served', G.dayServed, true);
   if(matched){
@@ -1449,7 +1499,8 @@ function doServe(){
     if(buffLv('combo')>0&&G.combo%3===0){const b=buffValue('combo',600);price+=b;toast(`🔥 ${G.combo}콤보! +${b.toLocaleString()}원!`,'gold');}
     if(buffLv('combo2')>0&&G.combo%5===0){const b=buffValue('combo2',1500);price+=b;toast(`🌟 ${G.combo}콤보! +${b.toLocaleString()}원!`,'gold');}
     if(buffLv('price')>0)price=Math.floor(price*(1+buffValue('price',0.04)));
-    if(buffLv('bigsale')>0 && savedMenu.diff>=4)price+=buffValue('bigsale',800);
+    if(buffLv('bigsale')>0 && savedMenu.diff>=4){const b=Math.floor(savedMenu.base*buffValue('bigsale',0.05));price+=b;toast(`🎯 대형주문! +${b.toLocaleString()}원`,'gold');}
+    if(wasVip){const b=Math.floor(price*0.5);price+=b;toast(`👑 VIP! +${b.toLocaleString()}원`,'gold');}
     // 호감도 보너스: 친한 손님일수록 팁 ↑
     if(servedCustId){
       const aff=getAffinity(servedCustId);
