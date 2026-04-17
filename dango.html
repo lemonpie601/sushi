@@ -711,6 +711,9 @@ input.hidden-file{display:none;}
 </head>
 <body>
 
+<div id="start"></div>
+<div id="game" style="display:none;"></div>
+
 <!-- 헤더 -->
 <div id="hdr">
   <div class="hdr-r1">
@@ -2175,7 +2178,6 @@ function toast(msg,cls){
   _tt=setTimeout(()=>el.className='',2400);
 }
 </script>
-
 <script>
 // ── PWA Service Worker ──
 if('serviceWorker' in navigator){
@@ -2223,42 +2225,47 @@ window.addEventListener('load',()=>{
   }
 });
 </script>
-<div id="app"></div>
-
 <script>
-function saveGame(){
-  localStorage.setItem('save','yes');
+function renderStart(){
+  const start = document.getElementById('start');
+  const save = localStorage.getItem('save');
+
+  start.innerHTML = `
+    <h1>🍡 당고 가게</h1>
+    ${
+      save
+      ? `<button onclick="continueGame()">이어하기</button>
+         <button onclick="newGame()">새로하기</button>`
+      : `<button onclick="newGame()">게임 시작</button>`
+    }
+  `;
 }
 
-function hasSave(){
-  return localStorage.getItem('save');
-}
+function startGame(){
+  document.getElementById('start').style.display = 'none';
+  document.getElementById('game').style.display = 'block';
 
-function render(){
-  const app = document.getElementById('app');
-
-  if(hasSave()){
-    app.innerHTML = `
-      <button onclick="continueGame()">이어하기</button>
-      <button onclick="newGame()">새로하기</button>
-    `;
-  }else{
-    app.innerHTML = `
-      <button onclick="newGame()">시작하기</button>
-    `;
-  }
+  document.getElementById('game').innerHTML = `
+    <h2>게임 화면</h2>
+    <button onclick="saveGame()">저장</button>
+  `;
 }
 
 function newGame(){
-  saveGame();
-  alert('새 게임');
+  localStorage.setItem('save','yes');
+  startGame();
 }
 
 function continueGame(){
-  alert('이어하기');
+  startGame();
 }
 
-render();
+function saveGame(){
+  localStorage.setItem('save','yes');
+  alert('저장됨');
+}
+
+renderStart();
 </script>
 </body>
 </html>
