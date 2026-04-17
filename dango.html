@@ -711,9 +711,6 @@ input.hidden-file{display:none;}
 </head>
 <body>
 
-<div id="start"></div>
-<div id="game" style="display:none;"></div>
-
 <!-- 헤더 -->
 <div id="hdr">
   <div class="hdr-r1">
@@ -2225,47 +2222,6 @@ window.addEventListener('load',()=>{
   }
 });
 </script>
-<script>
-function renderStart(){
-  const start = document.getElementById('start');
-  const save = localStorage.getItem('save');
 
-  start.innerHTML = `
-    <h1>🍡 당고 가게</h1>
-    ${
-      save
-      ? `<button onclick="continueGame()">이어하기</button>
-         <button onclick="newGame()">새로하기</button>`
-      : `<button onclick="newGame()">게임 시작</button>`
-    }
-  `;
-}
-
-function startGame(){
-  document.getElementById('start').style.display = 'none';
-  document.getElementById('game').style.display = 'block';
-
-  document.getElementById('game').innerHTML = `
-    <h2>게임 화면</h2>
-    <button onclick="saveGame()">저장</button>
-  `;
-}
-
-function newGame(){
-  localStorage.setItem('save','yes');
-  startGame();
-}
-
-function continueGame(){
-  startGame();
-}
-
-function saveGame(){
-  localStorage.setItem('save','yes');
-  alert('저장됨');
-}
-
-renderStart();
-</script>
 </body>
 </html>
