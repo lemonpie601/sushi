@@ -2223,5 +2223,42 @@ window.addEventListener('load',()=>{
   }
 });
 </script>
+<div id="app"></div>
+
+<script>
+function saveGame(){
+  localStorage.setItem('save','yes');
+}
+
+function hasSave(){
+  return localStorage.getItem('save');
+}
+
+function render(){
+  const app = document.getElementById('app');
+
+  if(hasSave()){
+    app.innerHTML = `
+      <button onclick="continueGame()">이어하기</button>
+      <button onclick="newGame()">새로하기</button>
+    `;
+  }else{
+    app.innerHTML = `
+      <button onclick="newGame()">시작하기</button>
+    `;
+  }
+}
+
+function newGame(){
+  saveGame();
+  alert('새 게임');
+}
+
+function continueGame(){
+  alert('이어하기');
+}
+
+render();
+</script>
 </body>
 </html>
