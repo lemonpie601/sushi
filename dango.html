@@ -3,9 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>당고집</title>
+<title>🍡 당고집</title>
 <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍡</text></svg>">
 <link rel="manifest" href="/sushi/manifest.json">
 <meta name="theme-color" content="#5a3018">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -15,6 +14,34 @@
 <link rel="apple-touch-icon" href="/sushi/icon.svg">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+
+/* ════════════════════════ 커스텀 스크롤바 ════════════════════════ */
+/* WebKit (Chrome/Safari/Edge) */
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,rgba(200,130,60,.5),rgba(160,90,40,.5));
+  border-radius:10px;
+}
+::-webkit-scrollbar-thumb:hover{
+  background:linear-gradient(180deg,rgba(200,130,60,.8),rgba(160,90,40,.8));
+}
+::-webkit-scrollbar-corner{background:transparent;}
+
+/* Firefox */
+*{scrollbar-width:thin;scrollbar-color:rgba(200,130,60,.5) transparent;}
+
+/* 어두운 배경(제작대, 모달)용 스크롤바 */
+#bench ::-webkit-scrollbar-thumb,
+#done-skewers::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,rgba(255,220,170,.45),rgba(255,200,140,.3));
+}
+#bench ::-webkit-scrollbar-thumb:hover,
+#done-skewers::-webkit-scrollbar-thumb:hover{
+  background:linear-gradient(180deg,rgba(255,220,170,.75),rgba(255,200,140,.6));
+}
+#bench,#bench *{scrollbar-color:rgba(255,220,170,.45) transparent;}
+#done-skewers{scrollbar-color:rgba(200,130,60,.4) transparent;}
 :root{
   --bg:#fef3e8;
   --pink:#ffb3c6;--pink2:#ff6b9d;--pink3:#c94070;
@@ -220,14 +247,15 @@ body.theme-forest #sign{background:#2a4018;border-color:#8ac060;color:#e0f8c8;}
 #cust-tbar-bg.empty{opacity:0;}
 #cust-tbar{height:5px;border-radius:3px;transition:width .3s,background .3s;background:var(--sage2);}
 
-/* ════════════════════════ 제작 디스플레이 ════════════════════════ */
+/* ════════════════════════ 제작 디스플레이 (좌: 완성꼬치 / 중: 현재 제작 / 우: 서빙) ════════════════════════ */
 #craft-display{
-  flex-shrink:0;height:75px;
+  flex-shrink:0;height:92px;
   background:linear-gradient(180deg,#fff8f0,#ffecd8);
   border-top:3px solid var(--peach2);
   border-bottom:2px solid var(--cream3);
   position:relative;overflow:hidden;
   box-shadow:0 -2px 8px rgba(200,120,60,.1);
+  display:flex;align-items:stretch;
 }
 #craft-display::before{
   content:'';position:absolute;inset:0;
@@ -237,20 +265,49 @@ body.theme-forest #sign{background:#2a4018;border-color:#8ac060;color:#e0f8c8;}
   );
   pointer-events:none;
 }
+/* 좌: 완성된 꼬치 목록 */
+#done-skewers{
+  flex-shrink:0;
+  width:clamp(70px,22vw,95px);
+  padding:6px 4px 6px 6px;
+  display:flex;flex-direction:column;gap:3px;
+  overflow-y:auto;overflow-x:hidden;
+  border-right:1.5px dashed rgba(200,130,60,.25);
+  position:relative;z-index:1;
+}
+.done-lbl{
+  font-family:'Jua',sans-serif;font-size:9px;
+  color:var(--text3);text-align:center;margin-bottom:2px;flex-shrink:0;
+  letter-spacing:.03em;
+}
+.done-sk{
+  font-size:13px;line-height:1;
+  background:linear-gradient(135deg,#ffecd8,#ffd4b0);
+  border:1.5px solid var(--peach2);
+  border-radius:8px;padding:3px 5px;
+  animation:doneAnim .3s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 1px 3px rgba(200,120,60,.2);
+  white-space:nowrap;text-align:center;
+  flex-shrink:0;
+}
+.done-empty{
+  font-size:9px;color:var(--text3);text-align:center;
+  padding:8px 4px;opacity:.6;line-height:1.4;
+}
+@keyframes doneAnim{from{transform:scale(0);}to{transform:scale(1);}}
+/* 중: 현재 제작 중 꼬치 */
+#craft-center{
+  flex:1;min-width:0;
+  position:relative;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:4px;
+}
 #craft-status{
-  position:absolute;top:5px;left:0;right:0;
-  text-align:center;
-  font-family:'Jua',sans-serif;font-size:11px;color:var(--text3);
-  pointer-events:none;z-index:1;
+  font-family:'Jua',sans-serif;font-size:10px;color:var(--text3);
+  pointer-events:none;z-index:1;margin-bottom:2px;text-align:center;
+  padding:0 4px;
 }
-#craft-status em{color:var(--pink2);font-style:normal;font-size:12px;}
-#craft-skewer-area{
-  position:absolute;
-  top:50%;left:0;right:0;
-  transform:translateY(-50%);
-  display:flex;align-items:center;justify-content:center;
-  height:54px;
-}
+#craft-status em{color:var(--pink2);font-style:normal;font-size:11px;}
 #craft-stick-wrap{
   position:relative;
   display:flex;align-items:center;
@@ -264,50 +321,65 @@ body.theme-forest #sign{background:#2a4018;border-color:#8ac060;color:#e0f8c8;}
   transition:width .15s;
 }
 #craft-handle{
-  width:11px;height:22px;border-radius:3px;
+  width:10px;height:20px;border-radius:3px;
   background:linear-gradient(180deg,#a86030,#784020);
   margin-left:0;flex-shrink:0;
   box-shadow:1px 2px 5px rgba(0,0,0,.3);
 }
 #craft-balls-wrap{
   position:absolute;
-  left:6px;top:50%;transform:translateY(-50%);
+  left:4px;top:50%;transform:translateY(-50%);
   display:flex;align-items:center;
   pointer-events:none;
 }
 .craft-slot{
   display:inline-flex;align-items:center;justify-content:center;
-  width:clamp(34px,9vw,42px);
-  height:clamp(34px,9vw,42px);
+  width:clamp(30px,8vw,40px);
+  height:clamp(30px,8vw,40px);
 }
 .craft-ball{
-  font-size:clamp(26px,8vw,36px);line-height:1;
+  font-size:clamp(24px,7vw,34px);line-height:1;
   animation:ballPop .2s cubic-bezier(.34,1.56,.64,1);
   filter:drop-shadow(0 2px 3px rgba(0,0,0,.15));
   display:inline-flex;align-items:center;justify-content:center;
 }
 .craft-ball-empty{
   display:inline-flex;align-items:center;justify-content:center;
-  width:clamp(24px,7vw,32px);height:clamp(24px,7vw,32px);
+  width:clamp(22px,6vw,30px);height:clamp(22px,6vw,30px);
 }
 @keyframes ballPop{
   0%{transform:scale(0) translateY(6px);opacity:0;}
   100%{transform:scale(1) translateY(0);opacity:1;}
 }
-#done-skewers{
-  position:absolute;bottom:4px;left:0;right:0;
-  display:flex;gap:5px;align-items:center;justify-content:center;
-  height:16px;overflow:hidden;pointer-events:none;
+/* 우: 서빙 버튼 */
+#craft-right{
+  flex-shrink:0;
+  width:clamp(72px,20vw,92px);
+  padding:6px;
+  display:flex;align-items:center;justify-content:center;
+  border-left:1.5px dashed rgba(200,130,60,.25);
+  position:relative;z-index:1;
 }
-.done-sk{
-  font-size:12px;
-  background:linear-gradient(135deg,#ffecd8,#ffd4b0);
-  border:1.5px solid var(--peach2);
-  border-radius:8px;padding:0 4px;
-  animation:doneAnim .3s cubic-bezier(.34,1.56,.64,1);
-  box-shadow:0 1px 4px rgba(200,120,60,.2);
+#serve-btn{
+  width:100%;height:100%;
+  font-family:'Jua',sans-serif;font-size:13px;
+  padding:0;border:none;border-radius:12px;
+  background:rgba(200,130,60,.15);
+  color:rgba(120,70,30,.4);
+  cursor:not-allowed;transition:all .2s;
+  letter-spacing:.03em;
+  border:1.5px solid rgba(200,130,60,.2);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;line-height:1.2;
 }
-@keyframes doneAnim{from{transform:scale(0);}to{transform:scale(1);}}
+#serve-btn .serve-emoji{font-size:22px;}
+#serve-btn.on{
+  background:linear-gradient(135deg,var(--sage2),var(--sage3));
+  color:#fff;cursor:pointer;
+  border-color:var(--sage2);
+  box-shadow:0 3px 0 var(--sage3),0 4px 14px rgba(60,120,40,.35);
+}
+#serve-btn.on:active{transform:translateY(2px);box-shadow:0 1px 0 var(--sage3);}
 
 /* ════════════════════════ 제작대 ════════════════════════ */
 #bench{
@@ -315,8 +387,8 @@ body.theme-forest #sign{background:#2a4018;border-color:#8ac060;color:#e0f8c8;}
   background:linear-gradient(180deg,var(--wood2),var(--wood3));
   padding:8px 10px;
   display:flex;flex-direction:column;gap:6px;
-  overflow-y:auto;
-  height:36vh;max-height:36vh;
+  overflow:hidden;
+  height:30vh;max-height:30vh;min-height:180px;
   padding-bottom:max(8px,env(safe-area-inset-bottom));
   position:relative;
 }
@@ -329,8 +401,18 @@ body.theme-forest #sign{background:#2a4018;border-color:#8ac060;color:#e0f8c8;}
 }
 
 #bench-tabs{
-  display:flex;gap:4px;flex-shrink:0;position:relative;z-index:1;
+  display:flex;gap:4px;flex-shrink:0;position:relative;z-index:1;align-items:center;
 }
+#rst-btn{
+  width:38px;height:34px;border-radius:10px;
+  background:rgba(255,255,255,.08);
+  border:1.5px solid rgba(255,255,255,.15);
+  font-size:15px;cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  color:rgba(255,236,200,.6);
+  transition:all .12s;
+}
+#rst-btn:active{background:rgba(255,255,255,.2);transform:scale(.92);}
 .btab{
   flex:1;font-family:'Jua',sans-serif;font-size:12px;
   padding:7px 8px;border:none;border-radius:10px;
@@ -345,36 +427,12 @@ body.theme-forest #sign{background:#2a4018;border-color:#8ac060;color:#e0f8c8;}
   border-color:rgba(255,255,255,.3);
 }
 .btab.disabled{opacity:.35;cursor:not-allowed;}
-.btab-panel{display:none;}
+#bench-panels{
+  flex:1;min-height:0;position:relative;z-index:1;
+  display:flex;flex-direction:column;
+}
+.btab-panel{display:none;flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:2px 4px 4px 0;}
 .btab-panel.on{display:block;}
-
-#serve-rst-row{display:flex;gap:6px;position:relative;z-index:1;}
-#serve-btn{
-  flex:1;font-family:'Jua',sans-serif;font-size:15px;
-  padding:0;height:43px;border:none;border-radius:12px;
-  background:rgba(255,255,255,.1);
-  color:rgba(255,236,200,.3);
-  cursor:not-allowed;transition:all .2s;
-  letter-spacing:.04em;
-  border:1.5px solid rgba(255,255,255,.08);
-}
-#serve-btn.on{
-  background:linear-gradient(135deg,var(--sage2),var(--sage3));
-  color:#fff;cursor:pointer;
-  border-color:var(--sage2);
-  box-shadow:0 3px 0 var(--sage3),0 4px 14px rgba(60,120,40,.35);
-}
-#serve-btn.on:active{transform:translateY(2px);box-shadow:0 1px 0 var(--sage3);}
-#rst-btn{
-  width:46px;height:43px;border-radius:12px;
-  background:rgba(255,255,255,.08);
-  border:1.5px solid rgba(255,255,255,.15);
-  font-size:18px;cursor:pointer;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  color:rgba(255,236,200,.6);
-  transition:all .12s;
-}
-#rst-btn:active{background:rgba(255,255,255,.2);}
 
 .bench-section{flex-shrink:0;position:relative;z-index:1;}
 .bench-lbl{
@@ -650,34 +708,42 @@ input.hidden-file{display:none;}
   </div>
 </div>
 
-<!-- 제작 디스플레이 -->
+<!-- 제작 디스플레이 (좌: 완성꼬치 / 중: 현재 제작 / 우: 서빙버튼) -->
 <div id="craft-display">
-  <div id="craft-status">꼬치 개수를 먼저 골라요!</div>
-  <div id="craft-skewer-area">
+  <div id="done-skewers">
+    <div class="done-lbl">완성 꼬치</div>
+    <div id="done-list"></div>
+  </div>
+  <div id="craft-center">
+    <div id="craft-status">당고를 골라서 꼬치에 꿰어요!</div>
     <div id="craft-stick-wrap">
       <div id="craft-stick-bg"></div>
       <div id="craft-handle"></div>
       <div id="craft-balls-wrap"></div>
     </div>
   </div>
-  <div id="done-skewers"></div>
+  <div id="craft-right">
+    <button id="serve-btn" onclick="doServe()">
+      <span class="serve-emoji">🍱</span>
+      <span>서빙!</span>
+    </button>
+  </div>
 </div>
 
 <!-- 제작대 -->
 <div id="bench">
-  <div id="serve-rst-row">
-    <button id="serve-btn" onclick="doServe()">🍱 서빙!</button>
-    <button id="rst-btn" onclick="resetCraft()">🗑</button>
-  </div>
   <div id="bench-tabs">
     <button class="btab on" id="btab-dango" onclick="switchTab('dango')">🍡 당고</button>
     <button class="btab" id="btab-sauce" onclick="switchTab('sauce')">🍯 소스</button>
+    <button id="rst-btn" onclick="resetCraft()" title="초기화">🗑</button>
   </div>
-  <div class="btab-panel on" id="panel-dango">
-    <div class="pick-row" id="dango-row"></div>
-  </div>
-  <div class="btab-panel" id="panel-sauce">
-    <div class="pick-row" id="sauce-row"></div>
+  <div id="bench-panels">
+    <div class="btab-panel on" id="panel-dango">
+      <div class="pick-row" id="dango-row"></div>
+    </div>
+    <div class="btab-panel" id="panel-sauce">
+      <div class="pick-row" id="sauce-row"></div>
+    </div>
   </div>
 </div>
 
@@ -1212,21 +1278,21 @@ function addDango(id){
 function updateCraftDisplay(){
   const statusEl=document.getElementById('craft-status');
   const ballsWrap=document.getElementById('craft-balls-wrap');
-  const doneEl=document.getElementById('done-skewers');
+  const doneEl=document.getElementById('done-list');
   const done=G.doneSkewers.length;
 
   if(done===0&&G.curBalls.length===0){
-    statusEl.innerHTML='당고를 골라서 꼬치에 꿰어요!';
+    statusEl.innerHTML='당고를 꿰어요!';
   } else if(G.sauce&&done>0&&G.curBalls.length===0){
-    statusEl.innerHTML=`✅ 꼬치 ${done}개 완성! <em>서빙 가능!</em>`;
+    statusEl.innerHTML=`✅ ${done}개 완성! <em>서빙!</em>`;
   } else {
-    statusEl.innerHTML=`🍡 ${done+1}번째 꼬치 — <em>${G.curBalls.length}/3</em>개`;
+    statusEl.innerHTML=`🍡 ${done+1}번째 — <em>${G.curBalls.length}/3</em>`;
   }
 
   // 슬롯 크기(각 칸) — 꿰어진 당고와 점선 원이 동일한 중심을 가지도록
-  const slotSz=Math.min(42,Math.max(34,window.innerWidth*0.09));
-  const emptySz=Math.min(32,Math.max(24,window.innerWidth*0.07));
-  const stickW=3*slotSz+18;
+  const slotSz=Math.min(40,Math.max(30,window.innerWidth*0.08));
+  const emptySz=Math.min(30,Math.max(22,window.innerWidth*0.06));
+  const stickW=3*slotSz+16;
   document.getElementById('craft-stick-bg').style.width=stickW+'px';
 
   let ballsHTML='';
@@ -1239,7 +1305,11 @@ function updateCraftDisplay(){
   }
   ballsWrap.innerHTML=ballsHTML;
 
-  doneEl.innerHTML=G.doneSkewers.map(sk=>`<span class="done-sk">${sk.map(b=>b.emoji).join('')}🍢</span>`).join('');
+  if(done===0){
+    doneEl.innerHTML=`<div class="done-empty">꼬치가<br>아직 없어요</div>`;
+  } else {
+    doneEl.innerHTML=G.doneSkewers.map(sk=>`<div class="done-sk">${sk.map(b=>b.emoji).join('')}🍢</div>`).join('');
+  }
 }
 function setSauce(s){
   G.sauce=s;
