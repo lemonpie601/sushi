@@ -1092,7 +1092,7 @@ function renderAffinityBadge(custId, isVip){
   const v=getAffinity(custId);
   const lv=affLevel(v);
   const name=custName(custId);
-  const hearts='❤'.repeat(Math.min(5,lv+(v>=5?1:0)))+(lv<4?'🤍'.repeat(Math.max(0,4-(lv+(v>=5?1:0)))):'');
+  const hearts='💝'.repeat(Math.min(5,lv+(v>=5?1:0)))+(lv<4?'🤍'.repeat(Math.max(0,4-(lv+(v>=5?1:0)))):'');
   const nextThreshold=[5,20,50,100,100][lv]||100;
   const prevThreshold=[0,5,20,50,100][lv]||0;
   const pct=lv>=4?100:Math.min(100,(v-prevThreshold)/(nextThreshold-prevThreshold)*100);
