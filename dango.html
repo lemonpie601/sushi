@@ -999,6 +999,31 @@ const BASE_MENUS=[
   {skewers:[{lemon:1,ice:1,mint:1}],sauce:'plain',base:1100,diff:3,needs:['lemon','ice','mint']},
   {skewers:[{coffee:1,caramel:1,sesame:1}],sauce:'caramel',base:1100,diff:3,needs:['coffee','caramel']},
   {skewers:[{cherry:1,strawb:1,sakura:1}],sauce:'strawb',base:1100,diff:3,needs:['cherry','strawb','sakura']},
+  // ===== 기본 + 고급 + 고급 =====
+  {skewers:[{white:1,grape:1,melon:1}],sauce:'plain',base:900,diff:2,needs:['grape','melon']},
+  {skewers:[{pink:1,cherry:1,berry:1}],sauce:'strawb',base:1000,diff:2,needs:['cherry','berry']},
+  {skewers:[{green:1,mint:1,lemon:1}],sauce:'matcha',base:1000,diff:2,needs:['mint','lemon']},
+  // ===== 고급끼리 혼합 =====
+  {skewers:[{peach:1,cherry:1,berry:1}],sauce:'cream',base:1100,diff:3,needs:['peach','cherry','berry','cream']},
+  {skewers:[{lemon:1,mint:1,yuzu:1}],sauce:'honey',base:1000,diff:3,needs:['lemon','mint','honey']},
+  {skewers:[{coffee:1,choco:1,caramel:1}],sauce:'cinnamon',base:1200,diff:3,needs:['coffee','choco','caramel','cinnamon']},
+  // ===== 과일 3종 =====
+  {skewers:[{grape:1,melon:1,peach:1}],sauce:'plain',base:1000,diff:2,needs:['grape','melon','peach']},
+  {skewers:[{strawb:1,cherry:1,berry:1}],sauce:'strawb',base:1100,diff:2,needs:['cherry','berry','strawb']},  
+  // ===== yuzu / mochi 확장 =====
+  {skewers:[{yuzu:3},{white:3}],sauce:'plain',base:1200,diff:3},
+  {skewers:[{mochi:3},{pink:3}],sauce:'kinako',base:1200,diff:3},  
+  {skewers:[{yuzu:1,lemon:1,white:1},{green:3}],sauce:'honey',base:1400,diff:4,needs:['lemon','honey']},
+  {skewers:[{mochi:1,sesame:1,white:1},{pink:3}],sauce:'kinako',base:1300,diff:4},  
+  // ===== ice 활용 부족 보완 =====
+  {skewers:[{ice:3},{lemon:3}],sauce:'plain',base:1400,diff:4,needs:['ice','lemon']},
+  {skewers:[{ice:1,mint:1,yuzu:1},{white:3}],sauce:'plain',base:1400,diff:4,needs:['ice','mint']},  
+  // ===== gold 혼합 부족 =====
+  {skewers:[{gold:1,white:1,sesame:1}],sauce:'honey',base:1200,diff:3,needs:['gold','honey']},
+  {skewers:[{gold:3},{berry:3}],sauce:'honey',base:1800,diff:4,needs:['gold','berry','honey']},  
+  // ===== 소스 다양화 =====
+  {skewers:[{white:1,pink:1,sakura:1}],sauce:'sakura',base:900,diff:2,needs:['sakura']},
+  {skewers:[{green:1,coffee:1,white:1}],sauce:'cream',base:1000,diff:2,needs:['coffee','cream']},
 ];
 
 // 업그레이드 아이템 — 레벨 시스템 (maxLv, 레벨당 효과 증가)
